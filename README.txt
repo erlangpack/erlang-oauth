@@ -1,0 +1,61 @@
+============
+erlang-oauth
+============
+
+
+What is this?
+-------------
+
+An Erlang wrapper around the OAuth protocol.
+
+
+What is OAuth?
+--------------
+
+An "open protocol to allow secure API authentication in a simple and standard
+method from desktop and web applications". See http://oauth.net/ for more info.
+
+
+What do I need?
+---------------
+
+Erlang, and erlang-fmt (http://tfletcher.com/dev/erlang-fmt).
+
+The Makefile assumes that erlang-fmt is contained in the parent directory of
+this one, so you might want to edit the Makefile if you have it elsewhere.
+
+
+How do I use it?
+----------------
+
+The crypto and inets applications needs to be running, and---as it's easy to
+forget---all the code needs to be compiled. A typical authentication flow
+would be similar to the following:
+
+  ConsumerKey = "key",
+
+  ConsumerSecret = "secret",
+
+  SignatureMethod = "HMAC-SHA1",
+
+  Consumer = oauth_consumer:new(ConsumerKey, ConsumerSecret, SignatureMethod),
+
+  {ok, RequestTokens} = oauth:tokens(oauth:get(RequestTokenURL, Consumer)),
+
+  % If necessary, direct user to the Service Provider,
+  % with Token = proplists:get_value(oauth_token, RequestTokens).
+
+  {ok, AccessTokens} = oauth:tokens(oauth:get(AccessTokenURL, Consumer, RequestTokens)),
+
+  oauth:get(ProtectedResourceURL, Consumer, AccessTokens, ExtraParams).
+
+
+Calling oauth:get or oauth:post returns an HTTP response tuple, as returned
+from http:request/4. Type "make termie", or look at oauth_test:termie/0 for
+a working example. Thanks Andy!
+
+
+Who can I contact if I have another question?
+---------------------------------------------
+
+Tim Fletcher (http://tfletcher.com/).

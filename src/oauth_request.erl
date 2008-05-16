@@ -1,0 +1,81 @@
+-module(oauth_request).
+
+-export([url/5]).
+
+% for testing:
+-export([plaintext_signature/2]).
+-export([hmac_sha1_signature/3]).
+-export([hmac_sha1_base_string/3]).
+-export([hmac_sha1_normalize/1]).
+
+-import(fmt, [sprintf/2, percent_encode/1]).
+-import(lists, [map/2]).
+-import(oauth_util, [implode/2]).
+
+
+url(Method, URL, ExtraParams, Consumer, []) ->
+  Params = oauth_params(Consumer, ExtraParams),
+  signed_url(Method, URL, Params, Consumer, _TokenSecret="");
+url(Method, URL, ExtraParams, Consumer, Tokens) ->
+  Token = proplists:lookup(oauth_token, Tokens),
+  TokenSecret = proplists:get_value(oauth_token_secret, Tokens),
+  Params = [Token|oauth_params(Consumer, ExtraParams)],
+  signed_url(Method, URL, Params, Consumer, TokenSecret).
+
+oauth_params(Consumer, ExtraParams) ->
+  proplists_merge([
+    {oauth_consumer_key, oauth_consumer:key(Consumer)},
+    {oauth_signature_method, oauth_consumer:signature_method(Consumer)},
+    {oauth_timestamp, oauth_util:unix_timestamp()},
+    {oauth_nonce, oauth_util:nonce()},
+    {oauth_version, "1.0"}
+  ], ExtraParams).
+
+proplists_merge({K,V}, Merged) ->
+  case proplists:is_defined(K, Merged) of
+    true ->
+      Merged;
+    false ->
+      [{K,V}|Merged]
+  end;
+proplists_merge(A, B) ->
+  lists:foldl(fun proplists_merge/2, A, B).
+
+signed_url(Method, URL, Params, Consumer, TokenSecret) ->
+  Signature = signature(Method, URL, Params, Consumer, TokenSecret),
+  sprintf("%s?%s", [URL, params_to_string([{oauth_signature, Signature}|Params])]).
+
+signature(Method, URL, Params, Consumer, TokenSecret) ->
+  ConsumerSecret = oauth_consumer:secret(Consumer),
+  case signature_method(Params) of
+    "PLAINTEXT" ->
+      plaintext_signature(ConsumerSecret, TokenSecret);
+    "HMAC-SHA1" ->
+      MethodString = string:to_upper(atom_to_list(Method)),
+      BaseString = hmac_sha1_base_string(MethodString, URL, Params),
+      hmac_sha1_signature(BaseString, ConsumerSecret, TokenSecret)
+  end.
+
+signature_method(Params) ->
+  proplists:get_value(oauth_signature_method, Params).
+
+plaintext_signature(ConsumerSecret, TokenSecret) ->
+  percent_encode(sprintf("%s&%s", [percent_encode(ConsumerSecret), percent_encode(TokenSecret)])).
+
+hmac_sha1_signature(BaseString, ConsumerSecret, TokenSecret) ->
+  base64:encode_to_string(crypto:sha_mac(hmac_sha1_key(ConsumerSecret, TokenSecret), BaseString)).
+
+hmac_sha1_key(ConsumerSecret, TokenSecret) ->
+  sprintf("%s&%s", [percent_encode(ConsumerSecret), percent_encode(TokenSecret)]).
+
+hmac_sha1_base_string(MethodString, URL, Params) ->
+  implode($&, map(fun fmt:percent_encode/1, [MethodString, URL, hmac_sha1_normalize(Params)])).
+
+hmac_sha1_normalize(Params) ->
+  params_to_string(lists:sort(fun({K,X},{K,Y}) -> X < Y; ({A,_},{B,_}) -> A < B end, Params)).
+
+params_to_string(Params) ->
+  implode($&, map(fun param_to_string/1, Params)).
+
+param_to_string({K,V}) ->
+  sprintf("%s=%s", [percent_encode(K), percent_encode(V)]).
