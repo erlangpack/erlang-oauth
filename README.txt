@@ -54,6 +54,11 @@ Calling oauth:get or oauth:post returns an HTTP response tuple, as returned
 from http:request/4. Type "make termie", or look at oauth_test:termie/0 for
 a working example. Thanks Andy!
 
+Alternatively, you can use oauth_request:header/6 to generate an HTTP
+Authorization header, as described by http://oauth.net/core/1.0/#auth_header.
+This isn't (currently) integrated into oauth:get and oauth:post, so you would
+need to use http:request/4 directly in this case.
+
 
 Who can I contact if I have another question?
 ---------------------------------------------

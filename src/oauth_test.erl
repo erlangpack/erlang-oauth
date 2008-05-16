@@ -9,6 +9,7 @@ all() ->
     apply(?MODULE, F, [])
   end, [
     params_from_string,
+    params_to_header_string,
     plaintext_signature,
     hmac_sha1_normalize,
     hmac_sha1_base_string,
@@ -20,6 +21,11 @@ params_from_string() ->
   % cf. http://oauth.net/core/1.0/#response_parameters (5.3)
   should_be_equal([{oauth_token, "ab3cd9j4ks73hf7g"}, {oauth_token_secret, "xyz4992k83j47x0b"}],
   oauth:params_from_string("oauth_token=ab3cd9j4ks73hf7g&oauth_token_secret=xyz4992k83j47x0b")).
+
+params_to_header_string() ->
+  % cf. http://oauth.net/core/1.0/#auth_header_authorization (5.4.1)
+  "oauth_consumer_key=\"0685bd9184jfhq22\",oauth_token=\"ad180jjd733klru7\"" =:=
+  oauth_request:params_to_header_string([{oauth_consumer_key, "0685bd9184jfhq22"}, {oauth_token, "ad180jjd733klru7"}]).
 
 plaintext_signature() ->
   % cf. http://oauth.net/core/1.0/#rfc.section.9.4.1

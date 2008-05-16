@@ -1,26 +1,33 @@
 -module(oauth_request).
 
 -export([url/5]).
+-export([header/6]).
 
 % for testing:
 -export([plaintext_signature/2]).
 -export([hmac_sha1_signature/3]).
 -export([hmac_sha1_base_string/3]).
 -export([hmac_sha1_normalize/1]).
+-export([params_to_header_string/1]).
 
 -import(fmt, [sprintf/2, percent_encode/1]).
 -import(lists, [map/2]).
 -import(oauth_util, [implode/2]).
 
 
-url(Method, URL, ExtraParams, Consumer, []) ->
-  Params = oauth_params(Consumer, ExtraParams),
-  signed_url(Method, URL, Params, Consumer, _TokenSecret="");
 url(Method, URL, ExtraParams, Consumer, Tokens) ->
-  Token = proplists:lookup(oauth_token, Tokens),
-  TokenSecret = proplists:get_value(oauth_token_secret, Tokens),
-  Params = [Token|oauth_params(Consumer, ExtraParams)],
+  {Params, TokenSecret} = oauth_params(Tokens, Consumer, ExtraParams),
   signed_url(Method, URL, Params, Consumer, TokenSecret).
+
+header(Realm, Method, URL, ExtraParams, Consumer, Tokens) ->
+  {Params, TokenSecret} = oauth_params(Tokens, Consumer, ExtraParams),
+  signed_header(Realm, Method, URL, Params, Consumer, TokenSecret).
+
+oauth_params([], Consumer, ExtraParams) ->
+  {"", oauth_params(Consumer, ExtraParams)};
+oauth_params(Tokens, Consumer, ExtraParams) ->
+  Params = [proplists:lookup(oauth_token, Tokens)|oauth_params(Consumer, ExtraParams)],
+  {proplists:get_value(oauth_token_secret, Tokens), Params}.
 
 oauth_params(Consumer, ExtraParams) ->
   proplists_merge([
@@ -42,8 +49,15 @@ proplists_merge(A, B) ->
   lists:foldl(fun proplists_merge/2, A, B).
 
 signed_url(Method, URL, Params, Consumer, TokenSecret) ->
-  Signature = signature(Method, URL, Params, Consumer, TokenSecret),
-  sprintf("%s?%s", [URL, params_to_string([{oauth_signature, Signature}|Params])]).
+  SignedParams = signed_params(Method, URL, Params, Consumer, TokenSecret),
+  sprintf("%s?%s", [URL, params_to_string(SignedParams)]).
+
+signed_header(Realm, Method, URL, Params, Consumer, TokenSecret) ->
+  SignedParams = signed_params(Method, URL, Params, Consumer, TokenSecret),
+  sprintf("Authorization: OAuth realm=\"%s\", %s", [Realm, params_to_header_string(SignedParams)]).
+
+signed_params(Method, URL, Params, Consumer, TokenSecret) ->
+  [{oauth_signature, signature(Method, URL, Params, Consumer, TokenSecret)}|Params].
 
 signature(Method, URL, Params, Consumer, TokenSecret) ->
   ConsumerSecret = oauth_consumer:secret(Consumer),
@@ -79,3 +93,9 @@ params_to_string(Params) ->
 
 param_to_string({K,V}) ->
   sprintf("%s=%s", [percent_encode(K), percent_encode(V)]).
+
+params_to_header_string(Params) ->
+  implode($,, map(fun param_to_header_string/1, Params)).
+
+param_to_header_string({K,V}) ->
+  sprintf("%s=\"%s\"", [percent_encode(K), percent_encode(V)]).
