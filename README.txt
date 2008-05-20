@@ -28,7 +28,7 @@ this one, so you might want to edit the Makefile if you have it elsewhere.
 How do I use it?
 ----------------
 
-The crypto and inets applications needs to be running, and---as it's easy to
+The crypto and inets applications need to be running, and---as it's easy to
 forget---all the code needs to be compiled. A typical authentication flow
 would be similar to the following:
 
