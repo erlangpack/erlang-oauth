@@ -24,10 +24,10 @@ header(Realm, Method, URL, ExtraParams, Consumer, Tokens) ->
   signed_header(Realm, Method, URL, Params, Consumer, TokenSecret).
 
 oauth_params([], Consumer, ExtraParams) ->
-  {"", oauth_params(Consumer, ExtraParams)};
+  {oauth_params(Consumer, ExtraParams), ""};
 oauth_params(Tokens, Consumer, ExtraParams) ->
   Params = [proplists:lookup(oauth_token, Tokens)|oauth_params(Consumer, ExtraParams)],
-  {proplists:get_value(oauth_token_secret, Tokens), Params}.
+  {Params, proplists:get_value(oauth_token_secret, Tokens)}.
 
 oauth_params(Consumer, ExtraParams) ->
   proplists_merge([
