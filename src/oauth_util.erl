@@ -23,16 +23,6 @@ unix_epoch() ->
 nonce() ->
   base64:encode_to_string(crypto:rand_bytes(32)). % cf. ruby-oauth
 
-implode(Sep, Strings) when is_list(Strings) ->
-  implode(Sep, Strings, []).
-
-implode(_Sep, [], Imploded) ->
-  lists:flatten(lists:reverse(Imploded));
-implode(Sep, [String|Strings], []) ->
-  implode(Sep, Strings, [String]);
-implode(Sep, [String|Strings], Imploded) ->
-  implode(Sep, Strings, [String,Sep|Imploded]).
-
 percent_decode(Chars) when is_list(Chars) ->
   percent_decode(Chars, []).
 

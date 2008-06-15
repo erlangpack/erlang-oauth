@@ -12,7 +12,6 @@
 
 -import(fmt, [sprintf/2, percent_encode/1]).
 -import(lists, [map/2]).
--import(oauth_util, [implode/2]).
 
 
 url(Method, URL, ExtraParams, Consumer, Tokens) ->
@@ -83,19 +82,19 @@ hmac_sha1_key(ConsumerSecret, TokenSecret) ->
   sprintf("%s&%s", [percent_encode(ConsumerSecret), percent_encode(TokenSecret)]).
 
 hmac_sha1_base_string(MethodString, URL, Params) ->
-  implode($&, map(fun fmt:percent_encode/1, [MethodString, URL, hmac_sha1_normalize(Params)])).
+  string:join(map(fun fmt:percent_encode/1, [MethodString, URL, hmac_sha1_normalize(Params)]), "&").
 
 hmac_sha1_normalize(Params) ->
   params_to_string(lists:sort(fun({K,X},{K,Y}) -> X < Y; ({A,_},{B,_}) -> A < B end, Params)).
 
 params_to_string(Params) ->
-  implode($&, map(fun param_to_string/1, Params)).
+  string:join(map(fun param_to_string/1, Params), "&").
 
 param_to_string({K,V}) ->
   sprintf("%s=%s", [percent_encode(K), percent_encode(V)]).
 
 params_to_header_string(Params) ->
-  implode($,, map(fun param_to_header_string/1, Params)).
+  string:join(map(fun param_to_header_string/1, Params), ",").
 
 param_to_header_string({K,V}) ->
   sprintf("%s=\"%s\"", [percent_encode(K), percent_encode(V)]).
