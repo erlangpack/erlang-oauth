@@ -3,6 +3,8 @@
 -export([get/2, get/3, get/4]).
 -export([post/2, post/3, post/4]).
 -export([tokens/1]).
+-export([token/1]).
+-export([token_secret/1]).
 -export([params_from_string/1]).
 
 
@@ -32,6 +34,12 @@ tokens({ok, {_,_,Data}}) ->
   {ok, {oauth_tokens, params_from_string(Data)}};
 tokens(Term) ->
   Term.
+
+token({oauth_tokens, Tokens}) ->
+  proplists:get_value(oauth_token, Tokens).
+
+token_secret({oauth_tokens, Tokens}) ->
+  proplists:get_value(oauth_token_secret, Tokens).
 
 fetch({Method, URL, Params}, Consumer) ->
   fetch({Method, URL, Params}, Consumer, []).
