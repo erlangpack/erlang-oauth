@@ -43,7 +43,7 @@ would be similar to the following:
   {ok, RequestTokens} = oauth:tokens(oauth:get(RequestTokenURL, Consumer)),
 
   % If necessary, direct user to the Service Provider,
-  % with Token = proplists:get_value(oauth_token, RequestTokens).
+  % with Token = oauth:token(RequestTokens).
 
   {ok, AccessTokens} = oauth:tokens(oauth:get(AccessTokenURL, Consumer, RequestTokens)),
 
