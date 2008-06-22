@@ -1,5 +1,6 @@
 -module(oauth_request).
 
+-export([params_string/5]).
 -export([url/5]).
 -export([header/6]).
 
@@ -14,13 +15,21 @@
 -import(lists, [map/2]).
 
 
+params_string(Method, URL, ExtraParams, Consumer, Tokens) ->
+  SignedParams = params(Method, URL, ExtraParams, Consumer, Tokens),
+  params_to_string(SignedParams).
+
 url(Method, URL, ExtraParams, Consumer, Tokens) ->
-  {Params, TokenSecret} = oauth_params(Tokens, Consumer, ExtraParams),
-  signed_url(Method, URL, Params, Consumer, TokenSecret).
+  SignedParams = params(Method, URL, ExtraParams, Consumer, Tokens),
+  sprintf("%s?%s", [URL, params_to_string(SignedParams)]).
 
 header(Realm, Method, URL, ExtraParams, Consumer, Tokens) ->
+  SignedParams = params(Method, URL, ExtraParams, Consumer, Tokens),
+  sprintf("Authorization: OAuth realm=\"%s\", %s", [Realm, params_to_header_string(SignedParams)]).
+
+params(Method, URL, ExtraParams, Consumer, Tokens) ->
   {Params, TokenSecret} = oauth_params(Tokens, Consumer, ExtraParams),
-  signed_header(Realm, Method, URL, Params, Consumer, TokenSecret).
+  [{oauth_signature, signature(Method, URL, Params, Consumer, TokenSecret)}|Params].
 
 oauth_params([], Consumer, ExtraParams) ->
   {oauth_params(Consumer, ExtraParams), ""};
@@ -46,17 +55,6 @@ proplists_merge({K,V}, Merged) ->
   end;
 proplists_merge(A, B) ->
   lists:foldl(fun proplists_merge/2, A, B).
-
-signed_url(Method, URL, Params, Consumer, TokenSecret) ->
-  SignedParams = signed_params(Method, URL, Params, Consumer, TokenSecret),
-  sprintf("%s?%s", [URL, params_to_string(SignedParams)]).
-
-signed_header(Realm, Method, URL, Params, Consumer, TokenSecret) ->
-  SignedParams = signed_params(Method, URL, Params, Consumer, TokenSecret),
-  sprintf("Authorization: OAuth realm=\"%s\", %s", [Realm, params_to_header_string(SignedParams)]).
-
-signed_params(Method, URL, Params, Consumer, TokenSecret) ->
-  [{oauth_signature, signature(Method, URL, Params, Consumer, TokenSecret)}|Params].
 
 signature(Method, URL, Params, Consumer, TokenSecret) ->
   ConsumerSecret = oauth_consumer:secret(Consumer),

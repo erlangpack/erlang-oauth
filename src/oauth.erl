@@ -9,26 +9,32 @@
 
 
 get(URL, Consumer) ->
-  fetch({get, URL, []}, Consumer).
+  get(URL, Consumer, [], []).
 
 get(URL, Consumer, {oauth_tokens, Tokens}) ->
-  fetch({get, URL, []}, Consumer, Tokens);
-get(URL, Consumer, Params) ->
-  fetch({get, URL, Params}, Consumer, []).
+  get(URL, Consumer, Tokens, []);
+get(URL, Consumer, Params) when is_list(Params)->
+  get(URL, Consumer, [], Params).
 
 get(URL, Consumer, {oauth_tokens, Tokens}, Params) ->
-  fetch({get, URL, Params}, Consumer, Tokens).
+  get(URL, Consumer, Tokens, Params);
+get(URL, Consumer, Tokens, Params) when is_list(Tokens) ->
+  http:request(oauth_request:url(get, URL, Params, Consumer, Tokens)).
 
 post(URL, Consumer) ->
-  fetch({post, URL, []}, Consumer).
+  post(URL, Consumer, [], []).
 
 post(URL, Consumer, {oauth_tokens, Tokens}) ->
-  fetch({post, URL, []}, Consumer, Tokens);
-post(URL, Consumer, Params) ->
-  fetch({post, URL, Params}, Consumer, []).
+  post(URL, Consumer, Tokens, []);
+post(URL, Consumer, Params) when is_list(Params) ->
+  post(URL, Consumer, [], Params).
 
 post(URL, Consumer, {oauth_tokens, Tokens}, Params) ->
-  fetch({post, URL, Params}, Consumer, Tokens).
+  post(URL, Consumer, Tokens, Params);
+post(URL, Consumer, Tokens, Params) when is_list(Tokens) ->
+  SignedParamsString = oauth_request:params_string(post, URL, Params, Consumer, Tokens),
+  Request = {URL, [], "application/x-www-form-urlencoded", SignedParamsString},
+  http:request(post, Request, [], []).
 
 tokens({ok, {_,_,Data}}) ->
   {ok, {oauth_tokens, params_from_string(Data)}};
@@ -40,13 +46,6 @@ token({oauth_tokens, Tokens}) ->
 
 token_secret({oauth_tokens, Tokens}) ->
   proplists:get_value(oauth_token_secret, Tokens).
-
-fetch({Method, URL, Params}, Consumer) ->
-  fetch({Method, URL, Params}, Consumer, []).
-
-fetch({Method, URL, Params}, Consumer, Tokens) ->
-  SignedURL = oauth_request:url(Method, URL, Params, Consumer, Tokens),
-  http:request(Method, {SignedURL, _Headers=[]}, [], []).
 
 params_from_string(Data) ->
   lists:map(fun param_from_string/1, explode($&, Data)).
