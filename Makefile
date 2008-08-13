@@ -1,6 +1,6 @@
 SHELL=/bin/sh
 
-EFLAGS=-pa ebin -pa ../erlang-fmt/ebin
+EFLAGS=-pa ebin -pa ../erlang-fmt/ebin -pa ../eunit/ebin
 
 all: compile
 
@@ -12,10 +12,10 @@ clean:
 	rm -rf ebin erl_crash.dump
 
 test: compile
-	erl $(EFLAGS) -noshell -eval 'crypto:start(), oauth_test:all(), c:q().'
+	erl $(EFLAGS) -noshell -s crypto -s oauth_unit test -s init stop
 
 termie: compile
-	erl $(EFLAGS) -noshell -eval 'crypto:start(), inets:start(), oauth_test:termie(), c:q().'
+	erl $(EFLAGS) -noshell -s crypto -s inets -s oauth_termie test -s init stop
 
 i: compile
-	erl $(EFLAGS) -eval 'crypto:start(), inets:start().'
+	erl $(EFLAGS) -s crypto -s inets

@@ -51,8 +51,8 @@ would be similar to the following:
 
 
 Calling oauth:get or oauth:post returns an HTTP response tuple, as returned
-from http:request/4. Type "make termie", or look at oauth_test:termie/0 for
-a working example. Thanks Andy!
+from http:request/4. Type "make termie", or look at the oauth_termie module
+for a working example. Thanks Andy!
 
 Alternatively, you can use oauth_request:header/6 to generate an HTTP
 Authorization header, as described by http://oauth.net/core/1.0/#auth_header.
