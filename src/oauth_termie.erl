@@ -20,7 +20,7 @@ test(Consumer, {ok, RequestTokenPair}) ->
 test(Consumer, {ok, AccessTokenPair}, EchoParams) ->
   EchoURL = "http://term.ie/oauth/example/echo_api.php",
   {ok, {_,_,Data}} = tee(oauth:get(EchoURL, Consumer, AccessTokenPair, EchoParams)),
-  tee(lists:keysort(1, oauth:params_from_string(Data))).
+  tee(lists:keysort(1, oauth_params:from_string(Data))).
 
 tee(X) ->
   error_logger:info_msg("~p~n~n", [X]), X.

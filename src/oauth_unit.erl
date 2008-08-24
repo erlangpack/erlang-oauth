@@ -6,7 +6,7 @@
 
 params_from_string_test_() ->
   % cf. http://oauth.net/core/1.0/#response_parameters (5.3)
-  Params = oauth:params_from_string("oauth_token=ab3cd9j4ks73hf7g&oauth_token_secret=xyz4992k83j47x0b"), [
+  Params = oauth_params:from_string("oauth_token=ab3cd9j4ks73hf7g&oauth_token_secret=xyz4992k83j47x0b"), [
   ?_assertEqual("ab3cd9j4ks73hf7g", proplists:get_value(oauth_token, Params)),
   ?_assertEqual("xyz4992k83j47x0b", proplists:get_value(oauth_token_secret, Params))
 ].
@@ -15,7 +15,7 @@ params_to_header_string_test_() ->
   % cf. http://oauth.net/core/1.0/#auth_header_authorization (5.4.1)
   Params = [{oauth_consumer_key, "0685bd9184jfhq22"}, {oauth_token, "ad180jjd733klru7"}],
   String = "oauth_consumer_key=\"0685bd9184jfhq22\",oauth_token=\"ad180jjd733klru7\"", [
-  ?_assertEqual(String, oauth_request:params_to_header_string(Params))
+  ?_assertEqual(String, oauth_params:to_header_string(Params))
 ].
 
 plaintext_signature_test_() -> [
@@ -25,19 +25,19 @@ plaintext_signature_test_() -> [
   ?plaintext_signature_test("djr9rjt0jd78jf88", "", "djr9rjt0jd78jf88%26")
 ].
 
-hmac_sha1_normalize_test_() -> [
+hmac_normalize_test_() -> [
   % cf. http://wiki.oauth.net/TestCases
-  ?hmac_sha1_normalize_test("name=", [{name,undefined}]),
-  ?hmac_sha1_normalize_test("a=b", [{a,b}]),
-  ?hmac_sha1_normalize_test("a=b&c=d", [{a,b},{c,d}]),
-  ?hmac_sha1_normalize_test("a=x%20y&a=x%21y", [{a,"x!y"},{a,"x y"}]),
-  ?hmac_sha1_normalize_test("x=a&x%21y=a", [{"x!y",a},{x,a}])
+  ?hmac_normalize_test("name=", [{name,undefined}]),
+  ?hmac_normalize_test("a=b", [{a,b}]),
+  ?hmac_normalize_test("a=b&c=d", [{a,b},{c,d}]),
+  ?hmac_normalize_test("a=x%20y&a=x%21y", [{a,"x!y"},{a,"x y"}]),
+  ?hmac_normalize_test("x=a&x%21y=a", [{"x!y",a},{x,a}])
 ].
 
-hmac_sha1_base_string_test_() -> [
+hmac_base_string_test_() -> [
   % cf. http://wiki.oauth.net/TestCases
-  ?hmac_sha1_base_string_test("GET", "http://example.com", [{n,v}], ["GET&http%3A%2F%2Fexample.com&n%3Dv"]),
-  ?hmac_sha1_base_string_test("POST", "https://photos.example.net/request_token", [
+  ?hmac_base_string_test("GET", "http://example.com", [{n,v}], ["GET&http%3A%2F%2Fexample.com&n%3Dv"]),
+  ?hmac_base_string_test("POST", "https://photos.example.net/request_token", [
     {oauth_version, "1.0"},
     {oauth_consumer_key, "dpf43f3p2l4k3l03"},
     {oauth_timestamp, "1191242090"},
@@ -48,7 +48,7 @@ hmac_sha1_base_string_test_() -> [
     "%3Ddpf43f3p2l4k3l03%26oauth_nonce%3Dhsu94j3884jdopsl%26oauth_signature_method",
     "%3DPLAINTEXT%26oauth_timestamp%3D1191242090%26oauth_version%3D1.0"
   ]),
-  ?hmac_sha1_base_string_test("GET", "http://photos.example.net/photos", [
+  ?hmac_base_string_test("GET", "http://photos.example.net/photos", [
     {file, "vacation.jpg"},
     {size, "original"},
     {oauth_version, "1.0"},
@@ -65,11 +65,11 @@ hmac_sha1_base_string_test_() -> [
   ])
 ].
 
-hmac_sha1_signature_test_() -> [
+hmac_signature_test_() -> [
   % cf. http://wiki.oauth.net/TestCases
-  ?hmac_sha1_signature_test("egQqG5AJep5sJ7anhXju1unge2I=", "cs", "", ["bs"]),
-  ?hmac_sha1_signature_test("VZVjXceV7JgPq/dOTnNmEfO0Fv8=", "cs", "ts", ["bs"]),
-  ?hmac_sha1_signature_test("tR3+Ty81lMeYAr/Fid0kMTYa/WM=", "kd94hf93k423kf44", "pfkkdhi9sl3r4s00", [
+  ?hmac_signature_test("egQqG5AJep5sJ7anhXju1unge2I=", "cs", "", ["bs"]),
+  ?hmac_signature_test("VZVjXceV7JgPq/dOTnNmEfO0Fv8=", "cs", "ts", ["bs"]),
+  ?hmac_signature_test("tR3+Ty81lMeYAr/Fid0kMTYa/WM=", "kd94hf93k423kf44", "pfkkdhi9sl3r4s00", [
     "GET&http%3A%2F%2Fphotos.example.net%2Fphotos&file%3Dvacation.jpg%26",
     "oauth_consumer_key%3Ddpf43f3p2l4k3l03%26oauth_nonce%3Dkllo9940pd9333jh%26",
     "oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1191242096%26",

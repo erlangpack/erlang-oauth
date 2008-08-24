@@ -5,7 +5,6 @@
 -export([tokens/1]).
 -export([token/1]).
 -export([token_secret/1]).
--export([params_from_string/1]).
 
 
 get(URL, Consumer) ->
@@ -37,7 +36,7 @@ post(URL, Consumer, Tokens, Params) when is_list(Tokens) ->
   http:request(post, Request, [], []).
 
 tokens({ok, {_,_,Data}}) ->
-  {ok, {oauth_tokens, params_from_string(Data)}};
+  {ok, {oauth_tokens, oauth_params:from_string(Data)}};
 tokens(Term) ->
   Term.
 
@@ -46,29 +45,3 @@ token({oauth_tokens, Tokens}) ->
 
 token_secret({oauth_tokens, Tokens}) ->
   proplists:get_value(oauth_token_secret, Tokens).
-
-params_from_string(Data) ->
-  lists:map(fun param_from_string/1, explode($&, Data)).
-
-param_from_string(Data) when is_list(Data) ->
-  param_from_string(break_at($=, Data));
-param_from_string({K, V}) ->
-  {list_to_atom(oauth_util:percent_decode(K)), oauth_util:percent_decode(V)}.
-
-explode(_Sep, []) ->
-  [];
-explode(Sep, Chars) ->
-  explode(Sep, break_at(Sep, Chars), []).
-
-explode(_Sep, {Param, []}, Params) ->
-  lists:reverse([Param|Params]);
-explode(Sep, {Param, Etc}, Params) ->
-  explode(Sep, break_at(Sep, Etc), [Param|Params]).
-
-break_at(Sep, Chars) ->
-  case lists:splitwith(fun(C) -> C =/= Sep end, Chars) of
-    Result={_, []} ->
-      Result;
-    {Before, [Sep|After]} ->
-      {Before, After}
-  end.
