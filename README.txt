@@ -40,14 +40,18 @@ would be similar to the following:
 
   Consumer = oauth_consumer:new(ConsumerKey, ConsumerSecret, SignatureMethod),
 
-  {ok, RequestTokens} = oauth:tokens(oauth:get(RequestTokenURL, Consumer)),
+  HttpResponse = oauth:get(RequestTokenURL, Consumer),
+
+  RequestTokenPair = oauth_token_pair:new(HttpResponse),
 
   % If necessary, direct user to the Service Provider,
-  % with Token = oauth:token(RequestTokens).
+  % with RequestToken = element(1, RequestTokenPair).
 
-  {ok, AccessTokens} = oauth:tokens(oauth:get(AccessTokenURL, Consumer, RequestTokens)),
+  HttpResponse2 = oauth:get(AccessTokenURL, Consumer, RequestTokenPair),
 
-  oauth:get(ProtectedResourceURL, Consumer, AccessTokens, ExtraParams).
+  AccessTokenPair = oauth_token_pair:new(HttpResponse2),
+
+  oauth:get(ProtectedResourceURL, Consumer, AccessTokenPair, ExtraParams).
 
 
 Calling oauth:get or oauth:post returns an HTTP response tuple, as returned
