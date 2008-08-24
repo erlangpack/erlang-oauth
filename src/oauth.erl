@@ -1,7 +1,11 @@
 -module(oauth).
 
--export([get/2, get/3, get/4]).
--export([post/2, post/3, post/4]).
+-export([get/2]).
+-export([get/3]).
+-export([get/4]).
+-export([post/2]).
+-export([post/3]).
+-export([post/4]).
 
 
 get(URL, Consumer) ->
