@@ -17,7 +17,7 @@ get(URL, Consumer, TokenPair) ->
   get(URL, Consumer, TokenPair, []).
 
 get(URL, Consumer, TokenPair, Params) ->
-  http:request(oauth_request:url("GET", URL, Params, Consumer, TokenPair)).
+  oauth_http:get(oauth_request:url("GET", URL, Params, Consumer, TokenPair)).
 
 post(URL, Consumer) ->
   post(URL, Consumer, {[], []}, []).
@@ -28,6 +28,7 @@ post(URL, Consumer, TokenPair) ->
   post(URL, Consumer, TokenPair, []).
 
 post(URL, Consumer, TokenPair, Params) ->
-  SignedParamsString = oauth_request:params_string("POST", URL, Params, Consumer, TokenPair),
-  Request = {URL, [], "application/x-www-form-urlencoded", SignedParamsString},
-  http:request(post, Request, [], []).
+  oauth_http:post(URL, {
+    "application/x-www-form-urlencoded",
+    oauth_request:params_string("POST", URL, Params, Consumer, TokenPair)
+  }).
