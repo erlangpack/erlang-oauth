@@ -13,7 +13,7 @@ new(HttpResponse) ->
   HttpResponse.
 
 new_from_params(List) ->
-  new(get(oauth_token, List), get(oauth_token_secret, List)).
+  new(get("oauth_token", List), get("oauth_token_secret", List)).
 
 get(Key, List) ->
   proplists:get_value(Key, List).

@@ -7,8 +7,8 @@
 params_from_string_test_() ->
   % cf. http://oauth.net/core/1.0/#response_parameters (5.3)
   Params = oauth_params:from_string("oauth_token=ab3cd9j4ks73hf7g&oauth_token_secret=xyz4992k83j47x0b"), [
-  ?_assertEqual("ab3cd9j4ks73hf7g", proplists:get_value(oauth_token, Params)),
-  ?_assertEqual("xyz4992k83j47x0b", proplists:get_value(oauth_token_secret, Params))
+  ?_assertEqual("ab3cd9j4ks73hf7g", proplists:get_value("oauth_token", Params)),
+  ?_assertEqual("xyz4992k83j47x0b", proplists:get_value("oauth_token_secret", Params))
 ].
 
 params_to_header_string_test_() ->

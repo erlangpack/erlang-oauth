@@ -23,7 +23,7 @@ from_string(Data) ->
 param_from_string(Data) when is_list(Data) ->
   param_from_string(break_at($=, Data));
 param_from_string({K, V}) ->
-  {list_to_atom(oauth_util:percent_decode(K)), oauth_util:percent_decode(V)}.
+  {oauth_util:percent_decode(K), oauth_util:percent_decode(V)}.
 
 break_at(Sep, Chars) ->
   case lists:splitwith(fun(C) -> C =/= Sep end, Chars) of
