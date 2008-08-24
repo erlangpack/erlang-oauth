@@ -18,22 +18,12 @@ to_header_string({K,V}) ->
   fmt:sprintf("%s=\"%s\"", [fmt:percent_encode(K), fmt:percent_encode(V)]).
 
 from_string(Data) ->
-  map(fun param_from_string/1, explode($&, Data)).
+  map(fun param_from_string/1, string:tokens(Data, "&")).
 
 param_from_string(Data) when is_list(Data) ->
   param_from_string(break_at($=, Data));
 param_from_string({K, V}) ->
   {list_to_atom(oauth_util:percent_decode(K)), oauth_util:percent_decode(V)}.
-
-explode(_Sep, []) ->
-  [];
-explode(Sep, Chars) ->
-  explode(Sep, break_at(Sep, Chars), []).
-
-explode(_Sep, {Param, []}, Params) ->
-  lists:reverse([Param|Params]);
-explode(Sep, {Param, Etc}, Params) ->
-  explode(Sep, break_at(Sep, Etc), [Param|Params]).
 
 break_at(Sep, Chars) ->
   case lists:splitwith(fun(C) -> C =/= Sep end, Chars) of
