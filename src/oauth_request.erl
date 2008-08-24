@@ -18,7 +18,7 @@ header(Realm, Method, URL, ExtraParams, Consumer, Tokens) ->
 
 params(Method, URL, ExtraParams, Consumer, Tokens) ->
   {Params, TokenSecret} = oauth_params(Tokens, Consumer, ExtraParams),
-  [{oauth_signature, signature(Method, URL, Params, Consumer, TokenSecret)}|Params].
+  [{oauth_signature, oauth_signature:new(Method, URL, Params, Consumer, TokenSecret)}|Params].
 
 oauth_params([], Consumer, ExtraParams) ->
   {oauth_params(Consumer, ExtraParams), ""};
@@ -45,14 +45,3 @@ proplists_merge({K,V}, Merged) ->
 proplists_merge(A, B) ->
   lists:foldl(fun proplists_merge/2, A, B).
 
-signature(Method, URL, Params, Consumer, TokenSecret) ->
-  ConsumerSecret = oauth_consumer:secret(Consumer),
-  case signature_method(Params) of
-    "PLAINTEXT" ->
-      oauth_plaintext:signature(ConsumerSecret, TokenSecret);
-    "HMAC-SHA1" ->
-      oauth_hmac:signature({Method, URL, Params}, ConsumerSecret, TokenSecret)
-  end.
-
-signature_method(Params) ->
-  proplists:get_value(oauth_signature_method, Params).
