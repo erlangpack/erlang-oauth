@@ -51,7 +51,7 @@ signature(Method, URL, Params, Consumer, TokenSecret) ->
     "PLAINTEXT" ->
       oauth_plaintext:signature(ConsumerSecret, TokenSecret);
     "HMAC-SHA1" ->
-      oauth_hmac:signature({string:to_upper(atom_to_list(Method)), URL, Params}, ConsumerSecret, TokenSecret)
+      oauth_hmac:signature({Method, URL, Params}, ConsumerSecret, TokenSecret)
   end.
 
 signature_method(Params) ->

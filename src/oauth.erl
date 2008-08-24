@@ -18,7 +18,7 @@ get(URL, Consumer, Params) when is_list(Params)->
 get(URL, Consumer, {oauth_tokens, Tokens}, Params) ->
   get(URL, Consumer, Tokens, Params);
 get(URL, Consumer, Tokens, Params) when is_list(Tokens) ->
-  http:request(oauth_request:url(get, URL, Params, Consumer, Tokens)).
+  http:request(oauth_request:url("GET", URL, Params, Consumer, Tokens)).
 
 post(URL, Consumer) ->
   post(URL, Consumer, [], []).
@@ -31,7 +31,7 @@ post(URL, Consumer, Params) when is_list(Params) ->
 post(URL, Consumer, {oauth_tokens, Tokens}, Params) ->
   post(URL, Consumer, Tokens, Params);
 post(URL, Consumer, Tokens, Params) when is_list(Tokens) ->
-  SignedParamsString = oauth_request:params_string(post, URL, Params, Consumer, Tokens),
+  SignedParamsString = oauth_request:params_string("POST", URL, Params, Consumer, Tokens),
   Request = {URL, [], "application/x-www-form-urlencoded", SignedParamsString},
   http:request(post, Request, [], []).
 
