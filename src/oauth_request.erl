@@ -5,26 +5,26 @@
 -export([header/6]).
 
 
-params_string(Method, URL, ExtraParams, Consumer, Tokens) ->
-  oauth_params:to_string(params(Method, URL, ExtraParams, Consumer, Tokens)).
+params_string(Method, URL, ExtraParams, Consumer, TokenPair) ->
+  oauth_params:to_string(params(Method, URL, ExtraParams, Consumer, TokenPair)).
 
-url(Method, URL, ExtraParams, Consumer, Tokens) ->
-  fmt:sprintf("%s?%s", [URL, oauth_params:to_string(params(Method, URL, ExtraParams, Consumer, Tokens))]).
+url(Method, URL, ExtraParams, Consumer, TokenPair) ->
+  fmt:sprintf("%s?%s", [URL, oauth_params:to_string(params(Method, URL, ExtraParams, Consumer, TokenPair))]).
 
-header(Realm, Method, URL, ExtraParams, Consumer, Tokens) ->
-  SignedParams = params(Method, URL, ExtraParams, Consumer, Tokens),
+header(Realm, Method, URL, ExtraParams, Consumer, TokenPair) ->
+  SignedParams = params(Method, URL, ExtraParams, Consumer, TokenPair),
   HeaderString = oauth_params:to_header_string(SignedParams),
   fmt:sprintf("Authorization: OAuth realm=\"%s\", %s", [Realm, HeaderString]).
 
-params(Method, URL, ExtraParams, Consumer, Tokens) ->
-  {Params, TokenSecret} = oauth_params(Tokens, Consumer, ExtraParams),
+params(Method, URL, ExtraParams, Consumer, TokenPair) ->
+  {Params, TokenSecret} = oauth_params(TokenPair, Consumer, ExtraParams),
   [{oauth_signature, oauth_signature:new(Method, URL, Params, Consumer, TokenSecret)}|Params].
 
-oauth_params([], Consumer, ExtraParams) ->
-  {oauth_params(Consumer, ExtraParams), ""};
-oauth_params(Tokens, Consumer, ExtraParams) ->
-  Params = [proplists:lookup(oauth_token, Tokens)|oauth_params(Consumer, ExtraParams)],
-  {Params, proplists:get_value(oauth_token_secret, Tokens)}.
+oauth_params({[], TokenSecret}, Consumer, ExtraParams) ->
+  {oauth_params(Consumer, ExtraParams), TokenSecret};
+oauth_params({Token, TokenSecret}, Consumer, ExtraParams) ->
+  Params = [{oauth_token, Token}|oauth_params(Consumer, ExtraParams)],
+  {Params, TokenSecret}.
 
 oauth_params(Consumer, ExtraParams) ->
   proplists_merge([
