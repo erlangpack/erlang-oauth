@@ -36,7 +36,8 @@ hmac_normalize_test_() -> [
 
 hmac_base_string_test_() -> [
   % cf. http://wiki.oauth.net/TestCases
-  ?hmac_base_string_test("GET", "http://example.com", [{n,v}], ["GET&http%3A%2F%2Fexample.com&n%3Dv"]),
+  ?hmac_base_string_test("GET", "http://example.com/", [{n,v}], ["GET&http%3A%2F%2Fexample.com%2F&n%3Dv"]),
+  ?hmac_base_string_test("GET", "http://example.com", [{n,v}], ["GET&http%3A%2F%2Fexample.com%2F&n%3Dv"]),
   ?hmac_base_string_test("POST", "https://photos.example.net/request_token", [
     {oauth_version, "1.0"},
     {oauth_consumer_key, "dpf43f3p2l4k3l03"},
