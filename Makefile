@@ -1,21 +1,31 @@
-SHELL=/bin/sh
+EFLAGS=-pa ebin -pa ../erlang-fmt/ebin -pa ../eunit/ebin -I../ -Iinclude
 
-EFLAGS=-pa ebin -pa ../erlang-fmt/ebin -pa ../eunit/ebin
+ERL := erl $(EFLAGS)
 
-all: compile
+ERL_SOURCES := $(wildcard src/*.erl)
 
-compile: clean
-	test -d ebin || mkdir ebin
-	erl $(EFLAGS) -make
+ERL_OBJECTS := $(ERL_SOURCES:src/%.erl=ebin/%.beam)
+
+
+all: objects
+
+objects: $(ERL_OBJECTS)
+
+ebin/%.beam: src/%.erl
+	@test -d ebin || mkdir ebin
+	erlc $(EFLAGS) -W +debug_info -o ebin $<
 
 clean:
-	rm -rf ebin erl_crash.dump
+	rm -rf ebin/*.beam erl_crash.dump
 
-test: compile
-	erl $(EFLAGS) -noshell -s crypto -s oauth_unit test -s init stop
+test: objects
+	$(ERL) -noshell -s crypto -s oauth_unit test -s init stop
 
-termie: compile
-	erl $(EFLAGS) -noshell -s crypto -s inets -s oauth_termie test -s init stop
+termie: objects
+	$(ERL) -noshell -s crypto -s inets -s oauth_termie test -s init stop
 
-i: compile
-	erl $(EFLAGS) -s crypto -s inets
+shell: objects
+	@$(ERL) -s crypto -s inets
+
+dialyzer:
+	dialyzer $(EFLAGS) --src -c src/
