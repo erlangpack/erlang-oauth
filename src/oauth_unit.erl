@@ -1,5 +1,6 @@
 -module(oauth_unit).
 
+-ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 -include("oauth_test_macros.hrl").
 
@@ -77,3 +78,4 @@ hmac_signature_test_() -> [
     "oauth_token%3Dnnch734d00sl2jdk%26oauth_version%3D1.0%26size%3Doriginal"
   ])
 ].
+-endif.
