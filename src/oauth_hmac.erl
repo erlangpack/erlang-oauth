@@ -16,7 +16,8 @@ base_string(Method, URL, Params) when is_list(Method) ->
   string:join(lists:map(fun fmt:percent_encode/1, [Method, uri_normalize(URL), normalize(Params)]), "&").
 
 normalize(Params) ->
-  oauth_params:to_string(sort(Params)).
+  StringParams = lists:map(fun({K, V}) when is_atom(K) -> {atom_to_list(K), V}; (I) -> I end, Params),
+  oauth_params:to_string(sort(StringParams)).
 
 uri_normalize(URL) ->
   case http_uri:parse(URL) of
