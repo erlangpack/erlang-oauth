@@ -14,7 +14,8 @@ url(Method, URL, ExtraParams, Consumer, TokenPair) ->
 header(Realm, Method, URL, ExtraParams, Consumer, TokenPair) ->
   SignedParams = params(Method, URL, ExtraParams, Consumer, TokenPair),
   HeaderString = oauth_params:to_header_string(SignedParams),
-  fmt:sprintf("Authorization: OAuth realm=\"%s\", %s", [Realm, HeaderString]).
+  {"Authorization", 
+   fmt:sprintf("OAuth realm=\"%s\", %s", [Realm, HeaderString])}.
 
 params(Method, URL, ExtraParams, Consumer, TokenPair) ->
   {Params, TokenSecret} = oauth_params(TokenPair, Consumer, ExtraParams),
