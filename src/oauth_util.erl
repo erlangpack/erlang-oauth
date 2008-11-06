@@ -32,18 +32,3 @@ percent_decode([$%,A,B|Etc], Decoded) when ?is_hex(A), ?is_hex(B) ->
   percent_decode(Etc, [erlang:list_to_integer([A,B], 16)|Decoded]);
 percent_decode([C|Etc], Decoded) when ?is_unreserved(C) ->
   percent_decode(Etc, [C|Decoded]).
-
-uri_join({Scheme, UserInfo, Host, Port, Path, Query}) ->
-  uri_join(Scheme, UserInfo, Host, Port, [Path, Query]).
-
-uri_join(http, UserInfo, Host, 80, URI) ->
-  uri_join(http, UserInfo, [Host|URI]);
-uri_join(https, UserInfo, Host, 443, URI) ->
-  uri_join(https, UserInfo, [Host|URI]);
-uri_join(Scheme, UserInfo, Host, Port, URI) ->
-  uri_join(Scheme, UserInfo, [Host, ":", Port|URI]).
-
-uri_join(Scheme, [], URI) ->
-  lists:concat([Scheme, "://"|URI]);
-uri_join(Scheme, UserInfo, URI) ->
-  lists:concat([Scheme, "://", UserInfo, "@"|URI]).
