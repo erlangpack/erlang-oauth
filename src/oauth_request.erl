@@ -17,7 +17,7 @@ header(Realm, Method, URL, ExtraParams, Consumer, TokenPair) ->
 
 params(Method, URL, ExtraParams, Consumer, TokenPair) ->
   {Params, TokenSecret} = oauth_params(TokenPair, Consumer, ExtraParams),
-  [{oauth_signature, oauth_signature:new(Method, URL, Params, Consumer, TokenSecret)}|Params].
+  [{oauth_signature, sign(Method, URL, Params, Consumer, TokenSecret)}|Params].
 
 oauth_params({[], TokenSecret}, Consumer, ExtraParams) ->
   {oauth_params(Consumer, ExtraParams), TokenSecret};
@@ -34,4 +34,11 @@ oauth_params(Consumer, ExtraParams) ->
     {oauth_version, "1.0"}
   ], ExtraParams).
 
-
+sign(RequestMethod, URL, Params, Consumer, TokenSecret) ->
+  ConsumerSecret = oauth_consumer:secret(Consumer),
+  case proplists:get_value(oauth_signature_method, Params) of
+    "PLAINTEXT" ->
+      oauth_plaintext:signature(ConsumerSecret, TokenSecret);
+    "HMAC-SHA1" ->
+      oauth_hmac:signature({RequestMethod, URL, Params}, ConsumerSecret, TokenSecret)
+  end.
