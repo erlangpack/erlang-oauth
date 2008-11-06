@@ -37,3 +37,13 @@ esprintf(Fmt, Values) when is_tuple(Values) ->
   esprintf(Fmt, tuple_to_list(Values));
 esprintf(Fmt, Values) when is_list(Values) ->
   fmt:sprintf(Fmt, [fmt:percent_encode(Value) || Value <- Values]).
+
+proplists_merge({K,V}, Merged) ->
+  case proplists:is_defined(K, Merged) of
+    true ->
+      Merged;
+    false ->
+      [{K,V}|Merged]
+  end;
+proplists_merge(A, B) ->
+  lists:foldl(fun proplists_merge/2, A, B).

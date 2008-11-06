@@ -26,7 +26,7 @@ oauth_params({Token, TokenSecret}, Consumer, ExtraParams) ->
   {Params, TokenSecret}.
 
 oauth_params(Consumer, ExtraParams) ->
-  proplists_merge([
+  oauth_util:proplists_merge([
     {oauth_consumer_key, oauth_consumer:key(Consumer)},
     {oauth_signature_method, oauth_consumer:signature_method(Consumer)},
     {oauth_timestamp, oauth_util:unix_timestamp()},
@@ -34,13 +34,4 @@ oauth_params(Consumer, ExtraParams) ->
     {oauth_version, "1.0"}
   ], ExtraParams).
 
-proplists_merge({K,V}, Merged) ->
-  case proplists:is_defined(K, Merged) of
-    true ->
-      Merged;
-    false ->
-      [{K,V}|Merged]
-  end;
-proplists_merge(A, B) ->
-  lists:foldl(fun proplists_merge/2, A, B).
 
