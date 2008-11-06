@@ -3,21 +3,23 @@
 -export([header/6, params_string/5, url/5]).
 
 
+header(Realm, Method, URL, ExtraParams, Consumer, TokenPair) ->
+  Params = signed_params(Method, URL, ExtraParams, Consumer, TokenPair),
+  HeaderString = oauth_params:to_header_string(Params),
+  HeaderValue = fmt:sprintf("OAuth realm=\"%s\", %s", [Realm, HeaderString]),
+  {"Authorization", HeaderValue}.
+
 params_string(Method, URL, ExtraParams, Consumer, TokenPair) ->
-  oauth_params:to_string(params(Method, URL, ExtraParams, Consumer, TokenPair)).
+  Params = signed_params(Method, URL, ExtraParams, Consumer, TokenPair),
+  oauth_params:to_string(Params).
 
 url(Method, URL, ExtraParams, Consumer, TokenPair) ->
-  fmt:sprintf("%s?%s", [URL, oauth_params:to_string(params(Method, URL, ExtraParams, Consumer, TokenPair))]).
+  Params = signed_params(Method, URL, ExtraParams, Consumer, TokenPair),
+  fmt:sprintf("%s?%s", [URL, oauth_params:to_string(Params)]).
 
-header(Realm, Method, URL, ExtraParams, Consumer, TokenPair) ->
-  SignedParams = params(Method, URL, ExtraParams, Consumer, TokenPair),
-  HeaderString = oauth_params:to_header_string(SignedParams),
-  {"Authorization", 
-   fmt:sprintf("OAuth realm=\"%s\", %s", [Realm, HeaderString])}.
-
-params(Method, URL, ExtraParams, Consumer, TokenPair) ->
+signed_params(Method, URL, ExtraParams, Consumer, TokenPair) ->
   {Params, TokenSecret} = oauth_params(TokenPair, Consumer, ExtraParams),
-  [{oauth_signature, sign(Method, URL, Params, Consumer, TokenSecret)}|Params].
+  [{oauth_signature, signature(Method, URL, Params, Consumer, TokenSecret)}|Params].
 
 oauth_params({[], TokenSecret}, Consumer, ExtraParams) ->
   {oauth_params(Consumer, ExtraParams), TokenSecret};
@@ -34,7 +36,7 @@ oauth_params(Consumer, ExtraParams) ->
     {oauth_version, "1.0"}
   ], ExtraParams).
 
-sign(RequestMethod, URL, Params, Consumer, TokenSecret) ->
+signature(RequestMethod, URL, Params, Consumer, TokenSecret) ->
   ConsumerSecret = oauth_consumer:secret(Consumer),
   case proplists:get_value(oauth_signature_method, Params) of
     "PLAINTEXT" ->
