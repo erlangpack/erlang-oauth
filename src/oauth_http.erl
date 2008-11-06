@@ -8,4 +8,6 @@ get(URL) ->
   http:request(URL).
 
 post(URL, {MimeType, Data}) ->
-  http:request(post, {URL, [], MimeType, Data}, [], []).
+  http:request(post, {URL, [], MimeType, Data}, [], []);
+post(URL, Data) ->
+  post(URL, {"application/x-www-form-urlencoded", Data}).

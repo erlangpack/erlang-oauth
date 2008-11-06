@@ -28,7 +28,5 @@ post(URL, Consumer, TokenPair) ->
   post(URL, Consumer, TokenPair, []).
 
 post(URL, Consumer, TokenPair, Params) ->
-  oauth_http:post(URL, {
-    "application/x-www-form-urlencoded",
-    oauth_request:params_string("POST", URL, Params, Consumer, TokenPair)
-  }).
+  Data = oauth_request:params_string("POST", URL, Params, Consumer, TokenPair),
+  oauth_http:post(URL, Data).
