@@ -32,3 +32,8 @@ percent_decode([$%,A,B|Etc], Decoded) when ?is_hex(A), ?is_hex(B) ->
   percent_decode(Etc, [erlang:list_to_integer([A,B], 16)|Decoded]);
 percent_decode([C|Etc], Decoded) when ?is_unreserved(C) ->
   percent_decode(Etc, [C|Decoded]).
+
+esprintf(Fmt, Values) when is_tuple(Values) ->
+  esprintf(Fmt, tuple_to_list(Values));
+esprintf(Fmt, Values) when is_list(Values) ->
+  fmt:sprintf(Fmt, [fmt:percent_encode(Value) || Value <- Values]).
