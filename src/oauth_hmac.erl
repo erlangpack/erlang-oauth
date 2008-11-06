@@ -15,8 +15,7 @@ base_string(Method, URL, Params) when is_list(Method) ->
   string:join([percent_encode(Str) || Str <- Unencoded], "&").
 
 normalize(Params) ->
-  StringParams = lists:map(fun({K, V}) when is_atom(K) -> {atom_to_list(K), V}; (I) -> I end, Params),
-  oauth_params:to_string(sort(StringParams)).
+  oauth_params:to_string(sort([to_string(KV) || KV <- Params])).
 
 sort(Params) ->
   lists:sort(fun({K,X},{K,Y}) -> X < Y; ({A,_},{B,_}) -> A < B end, Params).
@@ -26,3 +25,8 @@ key(ConsumerSecret, TokenSecret) ->
 
 b64(Data) ->
   base64:encode_to_string(Data).
+
+to_string({K, V}) when is_atom(K) ->
+  {atom_to_list(K), V};
+to_string({K, V}) when is_list(K) ->
+  {K, V}.
