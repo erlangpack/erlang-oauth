@@ -2,25 +2,20 @@
 
 -export([from_string/1, to_string/1, to_header_string/1]).
 
--import(lists, [map/2]).
-
-
-to_string(Params) when is_list(Params) ->
-  string:join(map(fun to_string/1, Params), "&");
-to_string({K,V}) ->
-  fmt:sprintf("%s=%s", [fmt:percent_encode(K), fmt:percent_encode(V)]).
-
-to_header_string(Params) when is_list(Params) ->
-  string:join(map(fun to_header_string/1, Params), ",");
-to_header_string({K,V}) ->
-  fmt:sprintf("%s=\"%s\"", [fmt:percent_encode(K), fmt:percent_encode(V)]).
 
 from_string(Data) ->
-  map(fun param_from_string/1, string:tokens(Data, "&")).
+  [percent_decode(break_at($=, P)) || P <- string:tokens(Data, "&")].
 
-param_from_string(Data) when is_list(Data) ->
-  param_from_string(break_at($=, Data));
-param_from_string({K, V}) ->
+to_string(Params) ->
+  to_string(Params, "%s=%s", "&").
+
+to_string(Params, Fmt, Sep) ->
+  string:join([oauth_util:esprintf(Fmt, Param) || Param <- Params], Sep).
+
+to_header_string(Params) ->
+  to_string(Params, "%s=\"%s\"", ",").
+
+percent_decode({K, V}) ->
   {oauth_util:percent_decode(K), oauth_util:percent_decode(V)}.
 
 break_at(Sep, Chars) ->
