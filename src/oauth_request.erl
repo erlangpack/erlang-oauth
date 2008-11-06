@@ -1,8 +1,6 @@
 -module(oauth_request).
 
--export([params_string/5]).
--export([url/5]).
--export([header/6]).
+-export([header/6, params_string/5, url/5]).
 
 
 params_string(Method, URL, ExtraParams, Consumer, TokenPair) ->

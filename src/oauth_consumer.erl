@@ -1,6 +1,6 @@
 -module(oauth_consumer).
 
--compile(export_all).
+-export([key/1, new/3, secret/1, signature_method/1]).
 
 
 new(Key, Secret, SignatureMethod) ->

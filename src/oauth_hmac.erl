@@ -1,10 +1,6 @@
 -module(oauth_hmac).
 
--export([signature/3]).
-
-% for testing:
--export([base_string/3]).
--export([normalize/1]).
+-export([base_string/3, normalize/1, signature/3]).
 
 
 signature({Method, URL, Params}, ConsumerSecret, TokenSecret) ->

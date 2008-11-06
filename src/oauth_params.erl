@@ -1,8 +1,6 @@
 -module(oauth_params).
 
--export([to_string/1]).
--export([to_header_string/1]).
--export([from_string/1]).
+-export([from_string/1, to_string/1, to_header_string/1]).
 
 -import(lists, [map/2]).
 

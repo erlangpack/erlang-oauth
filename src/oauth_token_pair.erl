@@ -1,7 +1,6 @@
 -module(oauth_token_pair).
 
--export([new/2]).
--export([new/1]).
+-export([new/1, new/2]).
 
 
 new(Token, TokenSecret) ->

@@ -1,7 +1,6 @@
 -module(oauth_http).
 
--export([get/1]).
--export([post/2]).
+-export([get/1, post/2]).
 
 
 get(URL) ->
