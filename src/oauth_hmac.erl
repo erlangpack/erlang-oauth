@@ -8,7 +8,8 @@
 signature({Method, URL, Params}, ConsumerSecret, TokenSecret) ->
   signature(base_string(Method, URL, Params), ConsumerSecret, TokenSecret);
 signature(BaseString, ConsumerSecret, TokenSecret) ->
-  b64(crypto:sha_mac(key(ConsumerSecret, TokenSecret), BaseString)).
+  Key = key(ConsumerSecret, TokenSecret),
+  base64:encode_to_string(crypto:sha_mac(Key, BaseString)).
 
 base_string(Method, URL, Params) when is_list(Method) ->
   Unencoded = [Method, oauth_uri:normalize(URL), normalize(Params)],
@@ -22,9 +23,6 @@ sort(Params) ->
 
 key(ConsumerSecret, TokenSecret) ->
   fmt:sprintf("%s&%s", [percent_encode(ConsumerSecret), percent_encode(TokenSecret)]).
-
-b64(Data) ->
-  base64:encode_to_string(Data).
 
 to_string({K, V}) when is_atom(K) ->
   {atom_to_list(K), V};
