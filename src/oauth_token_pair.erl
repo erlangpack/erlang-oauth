@@ -2,17 +2,14 @@
 
 -export([new/1, new/2]).
 
+-import(proplists, [get_value/2]).
+
 
 new(Token, TokenSecret) ->
   {Token, TokenSecret}.
 
 new(_HttpResponse={ok, {_,_,Data}}) ->
-  new_from_params(oauth_params:from_string(Data));
+  Params = oauth_params:from_string(Data),
+  {get_value("oauth_token", Params), get_value("oauth_token_secret", Params)};
 new(HttpResponse) ->
   HttpResponse.
-
-new_from_params(List) ->
-  new(get("oauth_token", List), get("oauth_token_secret", List)).
-
-get(Key, List) ->
-  proplists:get_value(Key, List).
