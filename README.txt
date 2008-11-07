@@ -55,7 +55,7 @@ would be similar to the following:
 
 
 Calling oauth:get or oauth:post returns an HTTP response tuple, as returned
-from http:request/4. Type "make termie", or look at the oauth_termie module
+from http:request/4. Type "make termie_hmac", or look at test/oauth_termie.erl
 for a working example. Thanks Andy!
 
 Alternatively, you can use oauth_request:header/6 to generate an HTTP

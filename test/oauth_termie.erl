@@ -5,8 +5,11 @@
 % cf. http://term.ie/oauth/example/
 
 
-test() ->
-  test(oauth_consumer:new("key", "secret", "HMAC-SHA1")).
+test_hmac() ->
+  test(consumer("HMAC-SHA1")).
+
+test_rsa() ->
+  test(consumer({"RSA-SHA1", "test/rsa_private_key.pem"})).
 
 test(Consumer) ->
   RequestTokenURL = "http://term.ie/oauth/example/request_token.php",
@@ -21,6 +24,9 @@ test(Consumer, AccessTokenPair, EchoParams) ->
   EchoURL = "http://term.ie/oauth/example/echo_api.php",
   {ok, {_,_,Data}} = tee(oauth:get(EchoURL, Consumer, AccessTokenPair, EchoParams)),
   tee(lists:keysort(1, oauth_params:from_string(Data))).
+
+consumer(SignatureMethod) ->
+  oauth_consumer:new("key", "secret", SignatureMethod).
 
 tee(X) ->
   error_logger:info_msg("~p~n~n", [X]), X.

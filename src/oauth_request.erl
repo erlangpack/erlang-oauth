@@ -43,7 +43,10 @@ signature(Params, Request, Consumer, TokenSecret) ->
       oauth_crypto:plaintext_signature(ConsumerSecret, TokenSecret);
     "HMAC-SHA1" ->
       BaseString = oauth_base:string(method(Request), url(Request), Params),
-      oauth_crypto:hmac_signature(BaseString, ConsumerSecret, TokenSecret)
+      oauth_crypto:hmac_signature(BaseString, ConsumerSecret, TokenSecret);
+    {"RSA-SHA1", PrivateKey} ->
+      BaseString = oauth_base:string(method(Request), url(Request), Params),
+      oauth_crypto:rsa_signature(BaseString, PrivateKey)
   end.
 
 oauth_params(Request, Consumer, Token) ->
@@ -54,7 +57,7 @@ set_consumer_key(Params, Consumer, Token) ->
   set_signature_method([Param|Params], Consumer, Token).
 
 set_signature_method(Params, Consumer, Token) ->
-  Method = oauth_consumer:signature_method(Consumer),
+  Method = oauth_consumer:signature_method_string(Consumer),
   set_token([{oauth_signature_method, Method}|Params], Token).
 
 set_token(Params, []) ->

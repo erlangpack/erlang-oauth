@@ -25,8 +25,11 @@ clean:
 test: beam_files ebin/oauth_unit.beam
 	@$(ERL) -noshell -s oauth_unit test -s init stop
 
-termie: beam_files ebin/oauth_termie.beam
-	@$(ERL) -noshell -s inets -s oauth_termie test -s init stop
+termie_hmac: beam_files ebin/oauth_termie.beam
+	@$(ERL) -noshell -s inets -s oauth_termie test_hmac -s init stop
+
+termie_rsa: beam_files ebin/oauth_termie.beam
+	@$(ERL) -noshell -s inets -s oauth_termie test_rsa -s init stop
 
 shell: beam_files
 	@$(ERL) -s inets
