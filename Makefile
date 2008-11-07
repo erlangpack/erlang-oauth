@@ -13,10 +13,10 @@ ebin/%.beam: src/%.erl
 	@test -d ebin || mkdir ebin
 	$(ERLC) $<
 
-ebin/oauth_unit.beam:
+ebin/oauth_unit.beam: test/oauth_unit.erl
 	$(ERLC) -pa ../eunit/ebin -I../ -Iinclude test/oauth_unit.erl
 
-ebin/oauth_termie.beam:
+ebin/oauth_termie.beam: test/oauth_termie.erl
 	$(ERLC) test/oauth_termie.erl
 
 clean:
