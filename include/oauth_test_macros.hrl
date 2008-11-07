@@ -1,5 +1,5 @@
 -define(plaintext_signature_test(ConsumerSecret, TokenSecret, ExpectedSignature),
-  ?_assertEqual(ExpectedSignature, oauth_plaintext:signature(ConsumerSecret, TokenSecret))
+  ?_assertEqual(ExpectedSignature, oauth_crypto:plaintext_signature(ConsumerSecret, TokenSecret))
 ).
 
 -define(normalize_test(ExpectedString, Params),
@@ -11,5 +11,5 @@
 end).
 
 -define(hmac_signature_test(ExpectedSignature, ConsumerSecret, TokenSecret, BaseString), fun() ->
-  ?assertEqual(ExpectedSignature, oauth_hmac:signature(string:join(BaseString, []), ConsumerSecret, TokenSecret))
+  ?assertEqual(ExpectedSignature, oauth_crypto:hmac_signature(string:join(BaseString, []), ConsumerSecret, TokenSecret))
 end).

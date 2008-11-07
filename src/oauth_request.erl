@@ -40,10 +40,10 @@ signature(Params, Request, Consumer, TokenSecret) ->
   ConsumerSecret = oauth_consumer:secret(Consumer),
   case oauth_consumer:signature_method(Consumer) of
     "PLAINTEXT" ->
-      oauth_plaintext:signature(ConsumerSecret, TokenSecret);
+      oauth_crypto:plaintext_signature(ConsumerSecret, TokenSecret);
     "HMAC-SHA1" ->
       BaseString = oauth_base:string(method(Request), url(Request), Params),
-      oauth_hmac:signature(BaseString, ConsumerSecret, TokenSecret)
+      oauth_crypto:hmac_signature(BaseString, ConsumerSecret, TokenSecret)
   end.
 
 oauth_params(Request, Consumer, Token) ->
