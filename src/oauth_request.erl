@@ -1,47 +1,81 @@
 -module(oauth_request).
 
--export([header/6, params_string/5, url/5]).
+-export([new/3, is_signed/1, sign/3]).
+
+-export([to_header/2, to_header/4, to_string/3, to_string/1, to_url/3, to_url/1]).
 
 
-header(Realm, Method, URL, ExtraParams, Consumer, TokenPair) ->
-  Params = signed_params(Method, URL, ExtraParams, Consumer, TokenPair),
-  HeaderString = oauth_params:to_header_string(Params),
+new(Method, URL, Params) ->
+  {Method, URL, Params}.
+
+is_signed(Request) ->
+  proplists:is_defined(oauth_signature, params(Request)).
+
+sign(Request, Consumer, {Token, TokenSecret}) ->
+  Params = oauth_params(Request, Consumer, Token),
+  Signature = signature(Params, Request, Consumer, TokenSecret),
+  setelement(3, Request, [{oauth_signature, Signature}|Params]).
+
+to_header(Realm, Request, Consumer, TokenPair) ->
+  to_header(Realm, sign(Request, Consumer, TokenPair)).
+
+to_header(Realm, SignedRequest) ->
+  HeaderString = oauth_params:to_header_string(params(SignedRequest)),
   HeaderValue = fmt:sprintf("OAuth realm=\"%s\", %s", [Realm, HeaderString]),
   {"Authorization", HeaderValue}.
 
-params_string(Method, URL, ExtraParams, Consumer, TokenPair) ->
-  Params = signed_params(Method, URL, ExtraParams, Consumer, TokenPair),
-  oauth_params:to_string(Params).
+to_string(Request, Consumer, TokenPair) ->
+  to_string(sign(Request, Consumer, TokenPair)).
 
-url(Method, URL, ExtraParams, Consumer, TokenPair) ->
-  Params = signed_params(Method, URL, ExtraParams, Consumer, TokenPair),
-  fmt:sprintf("%s?%s", [URL, oauth_params:to_string(Params)]).
+to_string(SignedRequest) ->
+  oauth_params:to_string(params(SignedRequest)).
 
-signed_params(Method, URL, ExtraParams, Consumer, TokenPair) ->
-  {Params, TokenSecret} = oauth_params(TokenPair, Consumer, ExtraParams),
-  [{oauth_signature, signature(Method, URL, Params, Consumer, TokenSecret)}|Params].
+to_url(Request, Consumer, TokenPair) ->
+  to_url(sign(Request, Consumer, TokenPair)).
 
-oauth_params({[], TokenSecret}, Consumer, ExtraParams) ->
-  {oauth_params(Consumer, ExtraParams), TokenSecret};
-oauth_params({Token, TokenSecret}, Consumer, ExtraParams) ->
-  Params = [{oauth_token, Token}|oauth_params(Consumer, ExtraParams)],
-  {Params, TokenSecret}.
+to_url(SignedRequest) ->
+  fmt:sprintf("%s?%s", [url(SignedRequest), to_string(SignedRequest)]).
 
-oauth_params(Consumer, ExtraParams) ->
-  oauth_util:proplists_merge([
-    {oauth_consumer_key, oauth_consumer:key(Consumer)},
-    {oauth_signature_method, oauth_consumer:signature_method(Consumer)},
-    {oauth_timestamp, oauth_util:unix_timestamp()},
-    {oauth_nonce, oauth_util:nonce()},
-    {oauth_version, "1.0"}
-  ], ExtraParams).
-
-signature(RequestMethod, URL, Params, Consumer, TokenSecret) ->
+signature(Params, Request, Consumer, TokenSecret) ->
   ConsumerSecret = oauth_consumer:secret(Consumer),
-  case proplists:get_value(oauth_signature_method, Params) of
+  case oauth_consumer:signature_method(Consumer) of
     "PLAINTEXT" ->
       oauth_plaintext:signature(ConsumerSecret, TokenSecret);
     "HMAC-SHA1" ->
-      BaseString = oauth_base:string(RequestMethod, URL, Params),
+      BaseString = oauth_base:string(method(Request), url(Request), Params),
       oauth_hmac:signature(BaseString, ConsumerSecret, TokenSecret)
   end.
+
+oauth_params(Request, Consumer, Token) ->
+  set_consumer_key(params(Request), Consumer, Token).
+
+set_consumer_key(Params, Consumer, Token) ->
+  Param = {oauth_consumer_key, oauth_consumer:key(Consumer)},
+  set_signature_method([Param|Params], Consumer, Token).
+
+set_signature_method(Params, Consumer, Token) ->
+  Method = oauth_consumer:signature_method(Consumer),
+  set_token([{oauth_signature_method, Method}|Params], Token).
+
+set_token(Params, []) ->
+  set_timestamp(Params);
+set_token(Params, Token) ->
+  set_timestamp([{oauth_token, Token}|Params]).
+
+set_timestamp(Params) ->
+  set_nonce([{oauth_timestamp, oauth_util:unix_timestamp()}|Params]).
+
+set_nonce(Params) ->
+  set_version([{oauth_nonce, oauth_util:nonce()}|Params]).
+
+set_version(Params) ->
+  [{oauth_version, "1.0"}|Params].
+
+method(_Request={Method, _, _}) ->
+  Method.
+
+url(_Request={_, URL, _}) ->
+  URL.
+
+params(_Request={_, _, Params}) ->
+  Params.

@@ -12,7 +12,8 @@ get(URL, Consumer, TokenPair) ->
   get(URL, Consumer, TokenPair, []).
 
 get(URL, Consumer, TokenPair, Params) ->
-  http:request(oauth_request:url("GET", URL, Params, Consumer, TokenPair)).
+  Request = oauth_request:new("GET", URL, Params),
+  http:request(oauth_request:to_url(Request, Consumer, TokenPair)).
 
 post(URL, Consumer) ->
   post(URL, Consumer, {[], []}, []).
@@ -23,6 +24,7 @@ post(URL, Consumer, TokenPair) ->
   post(URL, Consumer, TokenPair, []).
 
 post(URL, Consumer, TokenPair, Params) ->
-  Data = oauth_request:params_string("POST", URL, Params, Consumer, TokenPair),
+  Request = oauth_request:new("POST", URL, Params),
+  Data = oauth_request:to_string(Request, Consumer, TokenPair),
   MimeType = "application/x-www-form-urlencoded",
   http:request(post, {URL, [], MimeType, Data}, [], []).
