@@ -1,31 +1,46 @@
 -module(oauth).
 
--export([get/2, get/3, get/4, post/2, post/3, post/4]).
+-export([get/5, post/5, token/1, token_secret/1, uri/2, header/1, signed_params/6]).
 
 
-get(URL, Consumer) ->
-  get(URL, Consumer, {[], []}, []).
+get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
+  SignedParams = signed_params("GET", URL, ExtraParams, Consumer, Token, TokenSecret),
+  oauth_http:get(uri(URL, SignedParams)).
 
-get(URL, Consumer, Params) when is_list(Params) ->
-  get(URL, Consumer, {[], []}, Params);
-get(URL, Consumer, TokenPair) ->
-  get(URL, Consumer, TokenPair, []).
+post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
+  SignedParams = signed_params("GET", URL, ExtraParams, Consumer, Token, TokenSecret),
+  oauth_http:post(URL, oauth_uri:params_to_string(SignedParams)).
 
-get(URL, Consumer, TokenPair, Params) ->
-  Request = oauth_request:new("GET", URL, Params),
-  RequestURL = oauth_request:to_url(Request, Consumer, TokenPair),
-  http:request(get, {RequestURL, []}, [{autoredirect, false}], []).
+token(Params) ->
+  proplists:get_value("oauth_token", Params).
 
-post(URL, Consumer) ->
-  post(URL, Consumer, {[], []}, []).
+token_secret(Params) ->
+  proplists:get_value("oauth_token_secret", Params).
 
-post(URL, Consumer, Params) when is_list(Params) ->
-  post(URL, Consumer, {[], []}, Params);
-post(URL, Consumer, TokenPair) ->
-  post(URL, Consumer, TokenPair, []).
+uri(Base, []) ->
+  Base;
+uri(Base, Params) ->
+  lists:concat([Base, "?", oauth_uri:params_to_string(Params)]).
 
-post(URL, Consumer, TokenPair, Params) ->
-  Request = oauth_request:new("POST", URL, Params),
-  Data = oauth_request:to_string(Request, Consumer, TokenPair),
-  MimeType = "application/x-www-form-urlencoded",
-  http:request(post, {URL, [], MimeType, Data}, [{autoredirect, false}], []).
+header(Params) ->
+  {"Authorization", "OAuth " ++ oauth_uri:params_to_header_string(Params)}.
+
+signed_params(Method, URL, ExtraParams, Consumer, Token, TokenSecret) ->
+  Params = token_param(Token, params(Consumer, ExtraParams)),
+  [{"oauth_signature", oauth_signature:value(Method, URL, Params, Consumer, TokenSecret)}|Params].
+
+token_param("", Params) ->
+  Params;
+token_param(Token, Params) ->
+  [{"oauth_token", Token}|Params].
+
+params(_Consumer={Key, _, SigMethod}, Params) ->
+  Nonce = base64:encode_to_string(crypto:rand_bytes(32)), % cf. ruby-oauth
+  params(Key, SigMethod, oauth_unix:timestamp(), Nonce, Params).
+
+params(ConsumerKey, SigMethod, Timestamp, Nonce, Params) -> [
+  {"oauth_version", "1.0"},
+  {"oauth_nonce", Nonce},
+  {"oauth_timestamp", integer_to_list(Timestamp)},
+  {"oauth_signature_method", oauth_signature:method_to_string(SigMethod)},
+  {"oauth_consumer_key", ConsumerKey} | Params].
