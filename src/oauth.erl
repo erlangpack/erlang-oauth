@@ -8,7 +8,7 @@ get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
   oauth_http:get(uri(URL, SignedParams)).
 
 post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
-  SignedParams = signed_params("GET", URL, ExtraParams, Consumer, Token, TokenSecret),
+  SignedParams = signed_params("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
   oauth_http:post(URL, oauth_uri:params_to_string(SignedParams)).
 
 token(Params) ->
