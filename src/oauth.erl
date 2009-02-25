@@ -39,13 +39,13 @@ token_secret(Params) ->
 verify(Signature, HttpMethod, URL, Params, Consumer, TokenSecret) ->
   case signature_method(Consumer) of
     plaintext ->
-      Signature =:= signature(HttpMethod, URL, Params, Consumer, TokenSecret);
+      oauth_plaintext:verify(Signature, consumer_secret(Consumer), TokenSecret);
     hmac_sha1 ->
-      Signature =:= signature(HttpMethod, URL, Params, Consumer, TokenSecret);
+      BaseString = signature_base_string(HttpMethod, URL, Params),
+      oauth_hmac_sha1:verify(Signature, BaseString, consumer_secret(Consumer), TokenSecret);
     rsa_sha1 ->
       BaseString = signature_base_string(HttpMethod, URL, Params),
-      PublicKey = oauth_rsa_sha1:public_key(consumer_secret(Consumer)),
-      public_key:verify_signature(BaseString, sha, Signature, PublicKey)
+      oauth_rsa_sha1:verify(Signature, BaseString, consumer_secret(Consumer))
   end.
 
 signed_params(HttpMethod, URL, ExtraParams, Consumer, Token, TokenSecret) ->
