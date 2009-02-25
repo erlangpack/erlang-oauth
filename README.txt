@@ -5,9 +5,7 @@ Quick start (client usage):
   $ make
   ...
   $ erl -pa ebin -s crypto -s inets
-  Erlang (BEAM) emulator version 5.6.5 [source] [smp:2] [async-threads:0] [kernel-poll:false]
-
-  Eshell V5.6.5  (abort with ^G)
+  ...
   1> Consumer = {"key", "secret", hmac_sha1}.
   ...
   2> RequestTokenURL = "http://term.ie/oauth/example/request_token.php".
@@ -26,6 +24,8 @@ Quick start (client usage):
   ...
 
 
-Erlang R12B-5 is required for generating RSA-SHA1 signatures.
+Example client/server code: http://github.com/tim/erlang-oauth-examples.
 
-RSA-SHA1 signature verification is not yet implemented.
+Unit tests: http://github.com/tim/erlang-oauth-tests.
+
+Erlang R12B-5 required for RSA-SHA1.
