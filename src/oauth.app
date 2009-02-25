@@ -6,7 +6,6 @@
     oauth_http,
     oauth_plaintext,
     oauth_rsa_sha1,
-    oauth_signature,
     oauth_unix,
     oauth_uri
   ]},
