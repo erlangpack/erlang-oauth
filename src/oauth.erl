@@ -1,6 +1,10 @@
 -module(oauth).
 
--export([get/5, post/5, token/1, token_secret/1, uri/2, header/1, signed_params/6]).
+-export([get/5, post/5, uri/2, header/1]).
+
+-export([token/1, token_secret/1]).
+
+-export([signed_params/6, signature/5, signature_base_string/3]).
 
 
 get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
@@ -11,12 +15,6 @@ post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
   SignedParams = signed_params("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
   oauth_http:post(URL, oauth_uri:params_to_string(SignedParams)).
 
-token(Params) ->
-  proplists:get_value("oauth_token", Params).
-
-token_secret(Params) ->
-  proplists:get_value("oauth_token_secret", Params).
-
 uri(Base, []) ->
   Base;
 uri(Base, Params) ->
@@ -25,22 +23,66 @@ uri(Base, Params) ->
 header(Params) ->
   {"Authorization", "OAuth " ++ oauth_uri:params_to_header_string(Params)}.
 
-signed_params(Method, URL, ExtraParams, Consumer, Token, TokenSecret) ->
+token(Params) ->
+  proplists:get_value("oauth_token", Params).
+
+token_secret(Params) ->
+  proplists:get_value("oauth_token_secret", Params).
+
+signed_params(HttpMethod, URL, ExtraParams, Consumer, Token, TokenSecret) ->
   Params = token_param(Token, params(Consumer, ExtraParams)),
-  [{"oauth_signature", oauth_signature:value(Method, URL, Params, Consumer, TokenSecret)}|Params].
+  [{"oauth_signature", signature(HttpMethod, URL, Params, Consumer, TokenSecret)}|Params].
+
+signature(HttpMethod, URL, Params, Consumer, TokenSecret) ->
+  case signature_method(Consumer) of
+    plaintext ->
+      oauth_plaintext:signature(consumer_secret(Consumer), TokenSecret);
+    hmac_sha1 ->
+      BaseString = signature_base_string(HttpMethod, URL, Params),
+      oauth_hmac_sha1:signature(BaseString, consumer_secret(Consumer), TokenSecret);
+    {rsa_sha1, PrivateKey} ->
+      BaseString = signature_base_string(HttpMethod, URL, Params),
+      oauth_rsa_sha1:signature(BaseString, PrivateKey)
+  end.
+
+signature_base_string(HttpMethod, URL, Params) ->
+  NormalizedURL = oauth_uri:normalize(URL),
+  NormalizedParams = oauth_uri:params_to_string(lists:sort(Params)),
+  oauth_uri:calate("&", [HttpMethod, NormalizedURL, NormalizedParams]).
 
 token_param("", Params) ->
   Params;
 token_param(Token, Params) ->
   [{"oauth_token", Token}|Params].
 
-params(_Consumer={Key, _, SigMethod}, Params) ->
+params(Consumer, Params) ->
   Nonce = base64:encode_to_string(crypto:rand_bytes(32)), % cf. ruby-oauth
-  params(Key, SigMethod, oauth_unix:timestamp(), Nonce, Params).
+  params(Consumer, oauth_unix:timestamp(), Nonce, Params).
 
-params(ConsumerKey, SigMethod, Timestamp, Nonce, Params) -> [
-  {"oauth_version", "1.0"},
-  {"oauth_nonce", Nonce},
-  {"oauth_timestamp", integer_to_list(Timestamp)},
-  {"oauth_signature_method", oauth_signature:method_to_string(SigMethod)},
-  {"oauth_consumer_key", ConsumerKey} | Params].
+params(Consumer, Timestamp, Nonce, Params) ->
+  [ {"oauth_version", "1.0"}
+  , {"oauth_nonce", Nonce}
+  , {"oauth_timestamp", integer_to_list(Timestamp)}
+  , {"oauth_signature_method", signature_method_string(Consumer)}
+  , {"oauth_consumer_key", consumer_key(Consumer)}
+  | Params
+  ].
+
+signature_method_string(Consumer) ->
+  case signature_method(Consumer) of
+    plaintext ->
+      "PLAINTEXT";
+    hmac_sha1 ->
+      "HMAC-SHA1";
+    {rsa_sha1, _} ->
+      "RSA-SHA1"
+  end.
+
+signature_method(_Consumer={_, _, Method}) ->
+  Method.
+
+consumer_secret(_Consumer={_, Secret, _}) ->
+  Secret.
+
+consumer_key(_Consumer={Key, _, _}) ->
+  Key.
