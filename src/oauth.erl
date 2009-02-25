@@ -1,10 +1,17 @@
 -module(oauth).
 
--export([get/5, post/5, uri/2, header/1]).
-
--export([token/1, token_secret/1]).
-
--export([signed_params/6, signature/5, signature_base_string/3]).
+-export(
+  [ get/5
+  , header/1
+  , post/5
+  , signature/5
+  , signature_base_string/3
+  , signed_params/6
+  , token/1
+  , token_secret/1
+  , uri/2
+  , verify/6
+  ]).
 
 
 get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
@@ -28,6 +35,18 @@ token(Params) ->
 
 token_secret(Params) ->
   proplists:get_value("oauth_token_secret", Params).
+
+verify(Signature, HttpMethod, URL, Params, Consumer, TokenSecret) ->
+  case signature_method(Consumer) of
+    plaintext ->
+      Signature =:= signature(HttpMethod, URL, Params, Consumer, TokenSecret);
+    hmac_sha1 ->
+      Signature =:= signature(HttpMethod, URL, Params, Consumer, TokenSecret);
+    rsa_sha1 ->
+      BaseString = signature_base_string(HttpMethod, URL, Params),
+      PublicKey = oauth_rsa_sha1:public_key(consumer_secret(Consumer)),
+      public_key:verify_signature(BaseString, sha, Signature, PublicKey)
+  end.
 
 signed_params(HttpMethod, URL, ExtraParams, Consumer, Token, TokenSecret) ->
   Params = token_param(Token, params(Consumer, ExtraParams)),
