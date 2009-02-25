@@ -40,9 +40,9 @@ signature(HttpMethod, URL, Params, Consumer, TokenSecret) ->
     hmac_sha1 ->
       BaseString = signature_base_string(HttpMethod, URL, Params),
       oauth_hmac_sha1:signature(BaseString, consumer_secret(Consumer), TokenSecret);
-    {rsa_sha1, PrivateKey} ->
+    rsa_sha1 ->
       BaseString = signature_base_string(HttpMethod, URL, Params),
-      oauth_rsa_sha1:signature(BaseString, PrivateKey)
+      oauth_rsa_sha1:signature(BaseString, consumer_secret(Consumer))
   end.
 
 signature_base_string(HttpMethod, URL, Params) ->
@@ -74,7 +74,7 @@ signature_method_string(Consumer) ->
       "PLAINTEXT";
     hmac_sha1 ->
       "HMAC-SHA1";
-    {rsa_sha1, _} ->
+    rsa_sha1 ->
       "RSA-SHA1"
   end.
 
