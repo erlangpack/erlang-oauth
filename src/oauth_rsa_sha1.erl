@@ -20,7 +20,7 @@ to_binary(Term) when is_binary(Term) ->
 
 public_key(Path) when is_list(Path) ->
   {ok, [{cert, DerCert, not_encrypted}]} = public_key:pem_to_der(Path),
-  {ok, Cert} = pubkey_cert_records:decode_cert(DerCert, otp),
+  {ok, Cert} = public_key:pkix_decode_cert(DerCert, otp),
   public_key(Cert);
 public_key(#'OTPCertificate'{tbsCertificate=Cert}) ->
   public_key(Cert);
