@@ -1,5 +1,6 @@
 {application, oauth, [
   {description, "Erlang OAuth implementation"},
+  {vsn, "dev"},
   {modules, [
     oauth,
     oauth_hmac_sha1,
