@@ -4,7 +4,7 @@
 
 
 signature(CS, TS) ->
-  oauth_uri:encode(oauth_uri:calate("&", [CS, TS])).
+  oauth_uri:calate("&", [CS, TS]).
 
 verify(Signature, CS, TS) ->
   Signature =:= signature(CS, TS).
