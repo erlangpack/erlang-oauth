@@ -1,7 +1,8 @@
 -module(oauth_uri).
 
 -export([normalize/1, calate/2, encode/1]).
--export([params_from_string/1, params_to_string/1, params_to_header_string/1]).
+-export([params_from_string/1, params_to_string/1,
+  params_from_header_string/1, params_to_header_string/1]).
 
 -import(lists, [concat/1]).
 
@@ -36,6 +37,14 @@ normalize(Scheme, UserInfo, Acc) ->
 
 params_to_header_string(Params) ->
   intercalate(", ", [concat([encode(K), "=\"", encode(V), "\""]) || {K, V} <- Params]).
+
+params_from_header_string(String) ->
+  [param_from_header_string(Param) || Param <- re:split(String, ",\\s*", [{return, list}])].
+
+param_from_header_string(Param) ->
+  [Key, QuotedValue] = string:tokens(Param, "="),
+  Value = string:substr(QuotedValue, 2, length(QuotedValue) - 2),
+  {decode(Key), decode(Value)}.
 
 params_from_string(Params) ->
   [param_from_string(Param) || Param <- string:tokens(Params, "&")].
