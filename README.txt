@@ -24,8 +24,10 @@ Quick start (client usage):
   ...
 
 
-Example client/server code: http://github.com/tim/erlang-oauth-examples.
+Thanks to Jason Davies, Paul Bonser, and Roberto Aloi for their patches.
 
-Unit tests: http://github.com/tim/erlang-oauth-tests.
+Example client/server code is at http://github.com/tim/erlang-oauth-examples.
 
-Erlang R12B-5 required for RSA-SHA1.
+Unit tests are at http://github.com/tim/erlang-oauth-tests.
+
+Erlang R12B-5 or greater is required for RSA-SHA1.
