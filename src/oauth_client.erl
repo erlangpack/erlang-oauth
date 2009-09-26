@@ -110,14 +110,18 @@ handle_call({get, URL, Params, ParamsMethod}, _From, State={Consumer, _RParams, 
     {ok, Response={{_, Status, _}, Headers, Body}} ->
       case Status of
         200 ->
-          ContentType = proplists:get_value("content-type", Headers, ""),
-          MediaType = hd(string:tokens(ContentType, ";")),
-          case lists:suffix("/xml", MediaType) orelse lists:suffix("+xml", MediaType) of
-            true ->
-              {XML, []} = xmerl_scan:string(Body),
-              {reply, {ok, Headers, XML}, State};
-            false ->
-              {reply, {ok, Headers, Body}, State}
+          case proplists:get_value("content-type", Headers) of
+            undefined ->
+              {reply, {ok, Headers, Body}, State};
+            ContentType ->
+              MediaType = hd(string:tokens(ContentType, ";")),
+              case lists:suffix("/xml", MediaType) orelse lists:suffix("+xml", MediaType) of
+                true ->
+                  {XML, []} = xmerl_scan:string(Body),
+                  {reply, {ok, Headers, XML}, State};
+                false ->
+                  {reply, {ok, Headers, Body}, State}
+              end
           end;
         _ ->
           {reply, Response, State}
