@@ -26,6 +26,9 @@ Quick start (client usage):
 
 Thanks to Jason Davies, Paul Bonser, and Roberto Aloi for their patches.
 
+The percent encoding/decoding implementations are based on those found in
+the ibrowse library, written by Chandrashekhar Mullaparthi.
+
 Example client/server code is at http://github.com/tim/erlang-oauth-examples.
 
 Unit tests are at http://github.com/tim/erlang-oauth-tests.
