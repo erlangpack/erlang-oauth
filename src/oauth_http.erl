@@ -3,14 +3,14 @@
 -export([get/1, post/2, response_params/1, response_body/1, response_code/1]).
 
 
-get(URL) ->
-  request(get, {URL, []}).
+get(Url) ->
+  request(get, Url, _Headers=[], _Body=[], _Options=[]).
 
-post(URL, Data) ->
-  request(post, {URL, [], "application/x-www-form-urlencoded", Data}).
+post(Url, Data) ->
+  request(post, Url, _Headers=[], Data, _Options=[{content_type, "application/x-www-form-urlencoded"}]).
 
-request(Method, Request) ->
-  httpc:request(Method, Request, [{autoredirect, false}], []).
+request(Method, Url, Headers, Body, Options) ->
+  ibrowse:send_req_httpc(Url, Headers, Method, Body, Options, 30000).
 
 response_params(Response) ->
   oauth_uri:params_from_string(response_body(Response)).

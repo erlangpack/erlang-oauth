@@ -15,6 +15,7 @@
     kernel,
     stdlib,
     crypto,
-    inets
+    inets,
+    ibrowse
   ]}
 ]}.
