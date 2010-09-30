@@ -2,7 +2,7 @@
 
 -export([timestamp/0]).
 
-
+-spec timestamp() -> integer().
 timestamp() ->
   timestamp(calendar:universal_time()).
 

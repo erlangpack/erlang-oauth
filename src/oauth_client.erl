@@ -8,55 +8,75 @@
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, code_change/3, terminate/2]).
 
+-type consumer() :: tuple().
+-type state() :: {consumer()} | {consumer(), [proplists:property()]} | {consumer(), [proplists:property()], [proplists:property()]}.
+
+-export_type([consumer/0]).
+
 %%============================================================================
 %% API functions
 %%============================================================================
-
+-spec start(consumer()) -> {ok, pid()}.
 start(Consumer) ->
   gen_server:start(?MODULE, Consumer, []).
 
+-spec start({local | global, atom()}, consumer()) -> {ok, pid()}.
 start(ServerName, Consumer) ->
   gen_server:start(ServerName, ?MODULE, Consumer, []).
 
+-spec start_link(consumer()) -> {ok, pid()}.
 start_link(Consumer) ->
   gen_server:start_link(?MODULE, Consumer, []).
 
+-spec start_link({local | global, atom()}, consumer()) -> {ok, pid()}.
 start_link(ServerName, Consumer) ->
   gen_server:start_link(ServerName, ?MODULE, Consumer, []).
 
+-spec get_request_token(pid(), string()) -> string(). 
 get_request_token(Client, URL) ->
   get_request_token(Client, URL, [], header).
 
+-spec get_request_token(pid(), string(), [{string(), string()}]) -> string(). 
 get_request_token(Client, URL, Params) ->
   gen_server:call(Client, {get_request_token, URL, Params, header}).
 
+-spec get_request_token(pid(), string(), [{string(), string()}], header | querystring) -> string(). 
 get_request_token(Client, URL, Params, ParamsMethod) ->
   gen_server:call(Client, {get_request_token, URL, Params, ParamsMethod}).
 
+-spec get_access_token(pid(), string()) -> ok | term().
 get_access_token(Client, URL) ->
   get_access_token(Client, URL, [], header).
 
+-spec get_access_token(pid(), string(), [proplists:property()]) -> ok | term().
 get_access_token(Client, URL, Params) ->
   gen_server:call(Client, {get_access_token, URL, Params, header}).
 
+-spec get_access_token(pid(), string(), [proplists:property()], header | querystring) -> ok | term().
 get_access_token(Client, URL, Params, ParamsMethod) ->
   gen_server:call(Client, {get_access_token, URL, Params, ParamsMethod}).
 
+-spec get(pid(), string()) -> ok | term().
 get(Client, URL) ->
   get(Client, URL, [], header).
 
+-spec get(pid(), string(), [proplists:property()]) -> ok | term().
 get(Client, URL, Params) ->
   gen_server:call(Client, {get, URL, Params, header}).
 
+-spec get(pid(), string(), [proplists:property()], header | querystring) -> ok | term().
 get(Client, URL, Params, ParamsMethod) ->
   gen_server:call(Client, {get, URL, Params, ParamsMethod}).
 
+-spec access_token_params(pid()) -> [{string(), string()}].
 access_token_params(Client) ->
   gen_server:call(Client, {access_token_params}).
 
+-spec deauthorize(pid()) -> ok.
 deauthorize(Client) ->
   gen_server:cast(Client, deauthorize).
 
+-spec stop(pid()) -> ok.
 stop(Client) ->
   gen_server:cast(Client, stop).
 
@@ -76,9 +96,11 @@ oauth_get(querystring, URL, Params, Consumer, Token, TokenSecret) ->
 %% gen_server callbacks
 %%============================================================================
 
+-spec init(term()) -> {ok, state()}.
 init(Consumer) ->
   {ok, {Consumer}}.
 
+-spec handle_call(term(), reference(), state()) -> {reply, term(), state()}.
 handle_call({get_request_token, URL, Params, ParamsMethod}, _From, State={Consumer}) ->
   case oauth_get(ParamsMethod, URL, Params, Consumer, "", "") of
     {ok, Response} ->
@@ -132,6 +154,7 @@ handle_call({get, URL, Params, ParamsMethod}, _From, State={Consumer, _RParams, 
 handle_call({access_token_params}, _From, State={_Consumer, _RParams, AParams}) ->
   {reply, AParams, State}.
 
+-spec handle_cast(term(), state()) -> {noreply, state()} | {stop, normal, state()}.
 handle_cast(deauthorize, {Consumer, _RParams}) ->
   {noreply, {Consumer}};
 handle_cast(deauthorize, {Consumer, _RParams, _AParams}) ->
@@ -139,11 +162,14 @@ handle_cast(deauthorize, {Consumer, _RParams, _AParams}) ->
 handle_cast(stop, State) ->
   {stop, normal, State}.
 
+-spec handle_info(term(), state()) -> {noreply, state()}.
 handle_info(_Msg, State) ->
   {noreply, State}.
 
+-spec code_change(term(), state(), term()) -> {ok, state()}.
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
 
+-spec terminate(term(), state()) -> ok.
 terminate(normal, _State) ->
   ok.
