@@ -6,7 +6,7 @@
 
 -import(lists, [concat/1]).
 
-
+-spec normalize(iolist()) -> iolist().
 normalize(URI) ->
   case http_uri:parse(URI) of
     {Scheme, UserInfo, Host, Port, Path, _Query} ->
@@ -27,9 +27,11 @@ normalize(Scheme, [], Acc) ->
 normalize(Scheme, UserInfo, Acc) ->
   concat([Scheme, "://", UserInfo, "@"|Acc]).
 
+-spec params_to_header_string([{string(), string()}]) -> string().
 params_to_header_string(Params) ->
   intercalate(", ", [concat([encode(K), "=\"", encode(V), "\""]) || {K, V} <- Params]).
 
+-spec params_from_header_string(string()) -> [{string(), string()}].
 params_from_header_string(String) ->
   [param_from_header_string(Param) || Param <- re:split(String, ",\\s*", [{return, list}]), Param =/= ""].
 
@@ -38,15 +40,18 @@ param_from_header_string(Param) ->
   Value = string:substr(QuotedValue, 2, length(QuotedValue) - 2),
   {decode(Key), decode(Value)}.
 
+-spec params_from_string(string()) -> [{string(), string()}].
 params_from_string(Params) ->
   [param_from_string(Param) || Param <- string:tokens(Params, "&")].
 
 param_from_string(Param) ->
   list_to_tuple([decode(Value) || Value <- string:tokens(Param, "=")]).
 
+-spec params_to_string([{string(), string()}]) -> string().
 params_to_string(Params) ->
   intercalate("&", [calate("=", [K, V]) || {K, V} <- Params]).
 
+-spec calate(string(), [string()]) -> string().
 calate(Sep, Xs) ->
   intercalate(Sep, [encode(X) || X <- Xs]).
 
@@ -60,6 +65,7 @@ intersperse(Sep, [X|Xs]) ->
 
 -define(is_alphanum(C), C >= $A, C =< $Z; C >= $a, C =< $z; C >= $0, C =< $9).
 
+-spec encode(integer() | atom() | string()) -> string().
 encode(Term) when is_integer(Term) ->
   integer_to_list(Term);
 encode(Term) when is_atom(Term) ->

@@ -13,29 +13,35 @@
   , verify/6
   ]).
 
-
+-spec get(string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
   SignedParams = signed_params("GET", URL, ExtraParams, Consumer, Token, TokenSecret),
   oauth_http:get(uri(URL, SignedParams)).
 
+-spec post(string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
   SignedParams = signed_params("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
   oauth_http:post(URL, oauth_uri:params_to_string(SignedParams)).
 
+-spec uri(string(), [proplists:property()]) -> string().
 uri(Base, []) ->
   Base;
 uri(Base, Params) ->
   lists:concat([Base, "?", oauth_uri:params_to_string(Params)]).
 
+-spec header([{string(), string()}]) -> {string(), string()}.
 header(Params) ->
   {"Authorization", "OAuth " ++ oauth_uri:params_to_header_string(Params)}.
 
+-spec token([proplists:property()]) -> string().
 token(Params) ->
   proplists:get_value("oauth_token", Params).
 
+-spec token_secret([proplists:property()]) -> string().
 token_secret(Params) ->
   proplists:get_value("oauth_token_secret", Params).
 
+-spec verify(string(), string(), string(), [proplists:property()], oauth_client:consumer(), string()) -> boolean().
 verify(Signature, HttpMethod, URL, Params, Consumer, TokenSecret) ->
   case signature_method(Consumer) of
     plaintext ->
@@ -48,10 +54,12 @@ verify(Signature, HttpMethod, URL, Params, Consumer, TokenSecret) ->
       oauth_rsa_sha1:verify(Signature, BaseString, consumer_secret(Consumer))
   end.
 
+-spec signed_params(string(), string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> [{string(), string()}].
 signed_params(HttpMethod, URL, ExtraParams, Consumer, Token, TokenSecret) ->
   Params = token_param(Token, params(Consumer, ExtraParams)),
   [{"oauth_signature", signature(HttpMethod, URL, Params, Consumer, TokenSecret)}|Params].
 
+-spec signature(string(), string(), [proplists:property()], oauth_client:consumer(), string()) -> string().
 signature(HttpMethod, URL, Params, Consumer, TokenSecret) ->
   case signature_method(Consumer) of
     plaintext ->
@@ -64,6 +72,7 @@ signature(HttpMethod, URL, Params, Consumer, TokenSecret) ->
       oauth_rsa_sha1:signature(BaseString, consumer_secret(Consumer))
   end.
 
+-spec signature_base_string(string(), string(), [proplists:property()]) -> string(). 
 signature_base_string(HttpMethod, URL, Params) ->
   NormalizedURL = oauth_uri:normalize(URL),
   NormalizedParams = oauth_uri:params_to_string(lists:sort(Params)),
