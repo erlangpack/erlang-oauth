@@ -12,7 +12,7 @@ get(Url) ->
 post(Url, Data) ->
   request(post, Url, _Headers=[], Data, _Options=[{content_type, "application/x-www-form-urlencoded"}]).
 
--spec request(httpc:method(), tuple()) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+-spec request(httpc:method(), string(), Headers::[{string(), string()}], Body::string(), Options::[{string(), string()}]) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 request(Method, Url, Headers, Body, Options) ->
   ibrowse:send_req_httpc(Url, Headers, Method, Body, Options, 30000).
 
