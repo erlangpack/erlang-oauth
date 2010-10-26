@@ -14,7 +14,7 @@ post(Url, Data) ->
 
 -spec request(httpc:method(), string(), Headers::[{string(), string()}], Body::string(), Options::[{string(), string()}]) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 request(Method, Url, Headers, Body, Options) ->
-  ibrowse:send_req_httpc(Url, Headers, Method, Body, Options, 30000).
+  ibrowse:send_req_httpc(Url, Headers, Method, Body, [{ssl_options, [{ssl_imp, old}]}|Options], 30000).
 
 -spec response_params({http_status(), [{string(), string()}], string()}) -> [{string(), string()}].
 response_params(Response) ->
