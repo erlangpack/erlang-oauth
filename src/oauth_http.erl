@@ -5,16 +5,16 @@
 -type http_status() :: {string(), integer(), string()}.
 
 -spec get(string()) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
-get(URL) ->
-  request(get, {URL, []}).
+get(Url) ->
+  request(get, Url, _Headers=[], _Body=[], _Options=[]).
 
 -spec post(string(), term()) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
-post(URL, Data) ->
-  request(post, {URL, [], "application/x-www-form-urlencoded", Data}).
+post(Url, Data) ->
+  request(post, Url, _Headers=[], Data, _Options=[{content_type, "application/x-www-form-urlencoded"}]).
 
--spec request(httpc:method(), tuple()) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
-request(Method, Request) ->
-  httpc:request(Method, Request, [{autoredirect, false}], []).
+-spec request(httpc:method(), string(), Headers::[{string(), string()}], Body::string(), Options::[{string(), string()}]) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+request(Method, Url, Headers, Body, Options) ->
+  ibrowse:send_req_httpc(Url, Headers, Method, Body, [{ssl_options, [{ssl_imp, old}]}|Options], 30000).
 
 -spec response_params({http_status(), [{string(), string()}], string()}) -> [{string(), string()}].
 response_params(Response) ->

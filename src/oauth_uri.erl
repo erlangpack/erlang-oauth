@@ -33,7 +33,7 @@ params_to_header_string(Params) ->
 
 -spec params_from_header_string(string()) -> [{string(), string()}].
 params_from_header_string(String) ->
-  [param_from_header_string(Param) || Param <- re:split(String, ",\\s*", [{return, list}])].
+  [param_from_header_string(Param) || Param <- re:split(String, ",\\s*", [{return, list}]), Param =/= ""].
 
 param_from_header_string(Param) ->
   [Key, QuotedValue] = string:tokens(Param, "="),

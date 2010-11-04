@@ -87,8 +87,9 @@ stop(Client) ->
 oauth_get(header, URL, Params, Consumer, Token, TokenSecret) ->
   Signed = oauth:signed_params("GET", URL, Params, Consumer, Token, TokenSecret),
   {AuthorizationParams, QueryParams} = lists:partition(fun({K, _}) -> lists:prefix("oauth_", K) end, Signed),
-  Request = {oauth:uri(URL, QueryParams), [oauth:header(AuthorizationParams)]},
-  httpc:request(get, Request, [{autoredirect, false}], []);
+  OAuthUrl = oauth:uri(URL, QueryParams),
+  OAuthHeaders = [oauth:header(AuthorizationParams)],
+  ibrowse:send_req_httpc(OAuthUrl, OAuthHeaders, get, _Body=[], _Options=[{ssl_options, [{ssl_imp, old}]}], 30000);
 oauth_get(querystring, URL, Params, Consumer, Token, TokenSecret) ->
   oauth:get(URL, Params, Consumer, Token, TokenSecret).
 

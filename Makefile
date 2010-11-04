@@ -1,5 +1,14 @@
-all:
+
+.PHONY: test
+
+all: compile
+
+compile:
 	./rebar compile
 
-clean:
+clean: 
 	./rebar clean
+
+test:
+	./rebar eunit
+
