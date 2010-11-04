@@ -14,7 +14,7 @@ post(URL, Data) ->
 
 -spec request(httpc:method(), tuple()) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 request(Method, Request) ->
-  httpc:request(Method, Request, [{autoredirect, false}], []).
+  httpc:request(Method, Request, [{autoredirect, false}, {ssl, [{ssl_imp, old}]}], []).
 
 -spec response_params({http_status(), [{string(), string()}], string()}) -> [{string(), string()}].
 response_params(Response) ->
