@@ -12,7 +12,7 @@ get(URL) ->
 post(URL, Data) ->
   request(post, {URL, [], "application/x-www-form-urlencoded", Data}).
 
--spec request(httpc:method(), tuple()) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+-spec request(get|post, tuple()) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 request(Method, Request) ->
   httpc:request(Method, Request, [{autoredirect, false}, {ssl, [{ssl_imp, old}]}], []).
 
