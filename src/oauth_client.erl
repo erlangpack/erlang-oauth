@@ -6,7 +6,6 @@
          deauthorize/1, get/2, get/3, get/4, get_access_token/2,
          get_access_token/3, get_access_token/4, get_request_token/2, get_request_token/3,
          get_request_token/4, start/1, start/2, start_link/1, start_link/2, stop/1]).
--export([oauth_get/6]).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, code_change/3, terminate/2]).
 
@@ -18,21 +17,21 @@
 %%============================================================================
 %% API functions
 %%============================================================================
--spec start(consumer()) -> {ok, pid()}.
-start(Consumer) ->
-  gen_server:start(?MODULE, Consumer, []).
+-spec start(consumer() | {consumer(), [proplists:property()]}) -> {ok, pid()}.
+start(InitialState) ->
+  gen_server:start(?MODULE, InitialState, []).
 
--spec start({local | global, atom()}, consumer()) -> {ok, pid()}.
-start(ServerName, Consumer) ->
-  gen_server:start(ServerName, ?MODULE, Consumer, []).
+-spec start({local | global, atom()}, consumer() | {consumer(), [proplists:property()]}) -> {ok, pid()}.
+start(ServerName, InitialState) ->
+  gen_server:start(ServerName, ?MODULE, InitialState, []).
 
--spec start_link(consumer()) -> {ok, pid()}.
-start_link(Consumer) ->
-  gen_server:start_link(?MODULE, Consumer, []).
+-spec start_link(consumer() | {consumer(), [proplists:property()]}) -> {ok, pid()}.
+start_link(InitialState) ->
+  gen_server:start_link(?MODULE, InitialState, []).
 
--spec start_link({local | global, atom()}, consumer()) -> {ok, pid()}.
-start_link(ServerName, Consumer) ->
-  gen_server:start_link(ServerName, ?MODULE, Consumer, []).
+-spec start_link({local | global, atom()}, consumer() | {consumer(), [proplists:property()]}) -> {ok, pid()}.
+start_link(ServerName, InitialState) ->
+  gen_server:start_link(ServerName, ?MODULE, InitialState, []).
 
 -spec get_request_token(pid(), string()) -> string(). 
 get_request_token(Client, URL) ->
@@ -89,7 +88,7 @@ stop(Client) ->
 %%============================================================================
 %% Helper functions
 %%============================================================================
--spec oauth_get(header|querystring, string(), [proplists:property()], tuple(), string(), string()) -> {ok, {{string(), integer(), string()}, [{string(), string()}], iolist()}} | any().
+
 oauth_get(header, URL, Params, Consumer, Token, TokenSecret) ->
   Signed = oauth:signed_params("GET", URL, Params, Consumer, Token, TokenSecret),
   {AuthorizationParams, QueryParams} = lists:partition(fun({K, _}) -> lists:prefix("oauth_", K) end, Signed),
@@ -102,7 +101,9 @@ oauth_get(querystring, URL, Params, Consumer, Token, TokenSecret) ->
 %% gen_server callbacks
 %%============================================================================
 
--spec init(term()) -> {ok, state()}.
+-spec init(consumer() | {consumer(), [proplists:property()]}) -> {ok, state()}.
+init({{_,_,_}=Consumer, RParams}) ->
+  {ok, {Consumer, RParams}};
 init(Consumer) ->
   {ok, {Consumer}}.
 

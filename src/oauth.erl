@@ -8,7 +8,9 @@
   , signature_base_string/3
   , signed_params/6
   , token/1
+  , token_param/2
   , token_secret/1
+  , token_secret_param/2
   , uri/2
   , verify/6
   ]).
@@ -78,10 +80,17 @@ signature_base_string(HttpMethod, URL, Params) ->
   NormalizedParams = oauth_uri:params_to_string(lists:sort(Params)),
   oauth_uri:calate("&", [HttpMethod, NormalizedURL, NormalizedParams]).
 
+-spec token_param(string(), [proplists:property()]) -> [proplists:property()].
 token_param("", Params) ->
   Params;
 token_param(Token, Params) ->
   [{"oauth_token", Token}|Params].
+
+-spec token_secret_param(string(), [proplists:property()]) -> [proplists:property()].
+token_secret_param("", Params) ->
+  Params;
+token_secret_param(Token, Params) ->
+  [{"oauth_token_secret", Token}|Params].
 
 params(Consumer, Params) ->
   Nonce = base64:encode_to_string(crypto:rand_bytes(32)), % cf. ruby-oauth
