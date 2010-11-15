@@ -33,15 +33,15 @@ start_link(InitialState) ->
 start_link(ServerName, InitialState) ->
   gen_server:start_link(ServerName, ?MODULE, InitialState, []).
 
--spec get_request_token(pid(), string()) -> string(). 
+-spec get_request_token(pid(), string()) -> {ok, string()}. 
 get_request_token(Client, URL) ->
   get_request_token(Client, URL, [], header).
 
--spec get_request_token(pid(), string(), [{string(), string()}]) -> string(). 
+-spec get_request_token(pid(), string(), [{string(), string()}]) -> {ok, string()}. 
 get_request_token(Client, URL, Params) ->
   gen_server:call(Client, {get_request_token, URL, Params, header}).
 
--spec get_request_token(pid(), string(), [{string(), string()}], header | querystring) -> string(). 
+-spec get_request_token(pid(), string(), [{string(), string()}], header | querystring) -> {ok, string()}. 
 get_request_token(Client, URL, Params, ParamsMethod) ->
   gen_server:call(Client, {get_request_token, URL, Params, ParamsMethod}).
 
