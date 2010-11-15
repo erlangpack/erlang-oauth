@@ -2,9 +2,10 @@
 
 -behaviour(gen_server).
 
--export([access_token_params/1, deauthorize/1, get/2, get/3, get/4, get_access_token/2,
-  get_access_token/3, get_access_token/4, get_request_token/2, get_request_token/3,
-  get_request_token/4, start/1, start/2, start_link/1, start_link/2, stop/1]).
+-export([access_token_params/1, request_token_params/1,
+         deauthorize/1, get/2, get/3, get/4, get_access_token/2,
+         get_access_token/3, get_access_token/4, get_request_token/2, get_request_token/3,
+         get_request_token/4, start/1, start/2, start_link/1, start_link/2, stop/1]).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, code_change/3, terminate/2]).
 
@@ -71,6 +72,10 @@ get(Client, URL, Params, ParamsMethod) ->
 -spec access_token_params(pid()) -> [{string(), string()}].
 access_token_params(Client) ->
   gen_server:call(Client, {access_token_params}).
+
+-spec request_token_params(pid()) -> [{string(), string()}].
+request_token_params(Client) ->
+  gen_server:call(Client, {request_token_params}).
 
 -spec deauthorize(pid()) -> ok.
 deauthorize(Client) ->
@@ -152,7 +157,9 @@ handle_call({get, URL, Params, ParamsMethod}, _From, State={Consumer, _RParams, 
       {reply, Error, State}
   end;
 handle_call({access_token_params}, _From, State={_Consumer, _RParams, AParams}) ->
-  {reply, AParams, State}.
+  {reply, AParams, State};
+handle_call({request_token_params}, _From, State={_Consumer, RParams}) ->
+  {reply, RParams, State}.
 
 -spec handle_cast(term(), state()) -> {noreply, state()} | {stop, normal, state()}.
 handle_cast(deauthorize, {Consumer, _RParams}) ->
