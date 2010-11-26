@@ -2,7 +2,6 @@
 
 -export([timestamp/0]).
 
-
 timestamp() ->
   timestamp(calendar:universal_time()).
 

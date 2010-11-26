@@ -1,20 +1,7 @@
 -module(oauth).
 
--export(
-  [ get/5
-  , get/6
-  , header/1
-  , post/5
-  , post/6
-  , signature/5
-  , signature_base_string/3
-  , signed_params/6
-  , token/1
-  , token_secret/1
-  , uri/2
-  , verify/6
-  ]).
-
+-export([get/5, get/6, header/1, post/5, post/6, signature/5, signature_base_string/3,
+  signed_params/6, token/1, token_secret/1, uri/2, verify/6]).
 
 get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
   get(URL, ExtraParams, Consumer, Token, TokenSecret, []).

@@ -2,7 +2,6 @@
 
 -export([get/1, get/2, post/2, post/3, response_params/1, response_body/1, response_code/1]).
 
-
 get(URL) ->
   get(URL, []).
 

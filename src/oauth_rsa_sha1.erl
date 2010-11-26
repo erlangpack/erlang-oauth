@@ -4,7 +4,6 @@
 
 -include_lib("public_key/include/public_key.hrl").
 
-
 signature(BaseString, PrivateKeyPath) ->
   {ok, [Info]} = public_key:pem_to_der(PrivateKeyPath),
   {ok, PrivateKey} = public_key:decode_private_key(Info),

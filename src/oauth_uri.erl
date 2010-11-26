@@ -1,11 +1,9 @@
 -module(oauth_uri).
 
--export([normalize/1, calate/2, encode/1]).
--export([params_from_string/1, params_to_string/1,
-  params_from_header_string/1, params_to_header_string/1]).
+-export([calate/2, encode/1, normalize/1, params_from_string/1,
+  params_from_header_string/1, params_to_string/1, params_to_header_string/1]).
 
 -import(lists, [concat/1]).
-
 
 normalize(URI) ->
   case http_uri:parse(URI) of
