@@ -71,7 +71,7 @@ token_param(Token, Params) ->
 
 params(Consumer, Params) ->
   Nonce = base64:encode_to_string(crypto:rand_bytes(32)), % cf. ruby-oauth
-  params(Consumer, oauth_unix:timestamp(), Nonce, Params).
+  params(Consumer, unix_timestamp(), Nonce, Params).
 
 params(Consumer, Timestamp, Nonce, Params) ->
   [ {"oauth_version", "1.0"}
@@ -81,6 +81,18 @@ params(Consumer, Timestamp, Nonce, Params) ->
   , {"oauth_consumer_key", consumer_key(Consumer)}
   | Params
   ].
+
+unix_timestamp() ->
+  unix_timestamp(calendar:universal_time()).
+
+unix_timestamp(DateTime) ->
+  unix_seconds(DateTime) - unix_epoch().
+
+unix_epoch() ->
+  unix_seconds({{1970,1,1},{00,00,00}}).
+
+unix_seconds(DateTime) ->
+  calendar:datetime_to_gregorian_seconds(DateTime).
 
 signature_method_string(Consumer) ->
   case signature_method(Consumer) of
