@@ -2,8 +2,10 @@
 
 -export(
   [ get/5
+  , get/6
   , header/1
   , post/5
+  , post/6
   , signature/5
   , signature_base_string/3
   , signed_params/6
@@ -15,12 +17,18 @@
 
 
 get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
+  get(URL, ExtraParams, Consumer, Token, TokenSecret, []).
+
+get(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = signed_params("GET", URL, ExtraParams, Consumer, Token, TokenSecret),
-  oauth_http:get(uri(URL, SignedParams)).
+  oauth_http:get(uri(URL, SignedParams), HttpcOptions).
 
 post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
+  post(URL, ExtraParams, Consumer, Token, TokenSecret, []).
+
+post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = signed_params("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
-  oauth_http:post(URL, oauth_uri:params_to_string(SignedParams)).
+  oauth_http:post(URL, oauth_uri:params_to_string(SignedParams), HttpcOptions).
 
 uri(Base, []) ->
   Base;
