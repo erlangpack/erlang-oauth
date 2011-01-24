@@ -31,4 +31,4 @@ Example client/server code is at http://github.com/tim/erlang-oauth-examples.
 
 Unit tests are at http://github.com/tim/erlang-oauth-tests.
 
-Erlang R12B-5 or greater is required for RSA-SHA1.
+Erlang/OTP R14B or greater is required for RSA-SHA1.

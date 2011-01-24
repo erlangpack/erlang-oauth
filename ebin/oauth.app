@@ -1,6 +1,6 @@
 {application, oauth, [
   {description, "An Erlang OAuth 1.0 implementation"},
-  {vsn, "1.0.2"},
+  {vsn, "1.1.0"},
   {modules, [
     oauth,
     oauth_client,
