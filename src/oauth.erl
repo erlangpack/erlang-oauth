@@ -61,8 +61,15 @@ signature(HttpMethod, URL, Params, Consumer, TokenSecret) ->
 
 signature_base_string(HttpMethod, URL, Params) ->
   NormalizedURL = oauth_uri:normalize(URL),
-  NormalizedParams = oauth_uri:params_to_string(lists:sort(Params)),
+  NormalizedParams = normalized_params_string(Params),
   oauth_uri:calate("&", [HttpMethod, NormalizedURL, NormalizedParams]).
+
+normalized_params_string(Params) ->
+  % cf. http://tools.ietf.org/html/rfc5849#section-3.4.1.3.2
+  Encoded = [{oauth_uri:encode(K), oauth_uri:encode(V)} || {K, V} <- Params],
+  Sorted = lists:sort(Encoded),
+  Concatenated = [lists:concat([K, "=", V]) || {K, V} <- Sorted],
+  string:join(Concatenated, "&").
 
 token_param("", Params) ->
   Params;
