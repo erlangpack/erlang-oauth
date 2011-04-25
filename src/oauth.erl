@@ -2,8 +2,10 @@
 
 -export(
   [ get/5
+  , get/6
   , header/1
   , post/5
+  , post/6
   , signature/5
   , signature_base_string/3
   , signed_params/6
@@ -17,13 +19,21 @@
 
 -spec get(string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
+  get(URL, ExtraParams, Consumer, Token, TokenSecret, []).
+
+-spec get(string(), [proplists:property()], oauth_client:consumer(), string(), string(), [proplists:property()]) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+get(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = signed_params("GET", URL, ExtraParams, Consumer, Token, TokenSecret),
-  oauth_http:get(uri(URL, SignedParams)).
+  oauth_http:get(uri(URL, SignedParams), HttpcOptions).
 
 -spec post(string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
+  post(URL, ExtraParams, Consumer, Token, TokenSecret, []).
+
+-spec post(string(), [proplists:property()], oauth_client:consumer(), string(), string(), [proplists:property()]) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = signed_params("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
-  oauth_http:post(URL, oauth_uri:params_to_string(SignedParams)).
+  oauth_http:post(URL, oauth_uri:params_to_string(SignedParams), HttpcOptions).
 
 -spec uri(string(), [proplists:property()]) -> string().
 uri(Base, []) ->
@@ -77,8 +87,15 @@ signature(HttpMethod, URL, Params, Consumer, TokenSecret) ->
 -spec signature_base_string(string(), string(), [proplists:property()]) -> string(). 
 signature_base_string(HttpMethod, URL, Params) ->
   NormalizedURL = oauth_uri:normalize(URL),
-  NormalizedParams = oauth_uri:params_to_string(lists:sort(Params)),
+  NormalizedParams = normalized_params_string(Params),
   oauth_uri:calate("&", [HttpMethod, NormalizedURL, NormalizedParams]).
+
+normalized_params_string(Params) ->
+  % cf. http://tools.ietf.org/html/rfc5849#section-3.4.1.3.2
+  Encoded = [{oauth_uri:encode(K), oauth_uri:encode(V)} || {K, V} <- Params],
+  Sorted = lists:sort(Encoded),
+  Concatenated = [lists:concat([K, "=", V]) || {K, V} <- Sorted],
+  string:join(Concatenated, "&").
 
 -spec token_param(string(), [proplists:property()]) -> [proplists:property()].
 token_param("", Params) ->
@@ -94,7 +111,7 @@ token_secret_param(Token, Params) ->
 
 params(Consumer, Params) ->
   Nonce = base64:encode_to_string(crypto:rand_bytes(32)), % cf. ruby-oauth
-  params(Consumer, oauth_unix:timestamp(), Nonce, Params).
+  params(Consumer, unix_timestamp(), Nonce, Params).
 
 params(Consumer, Timestamp, Nonce, Params) ->
   [ {"oauth_version", "1.0"}
@@ -104,6 +121,18 @@ params(Consumer, Timestamp, Nonce, Params) ->
   , {"oauth_consumer_key", consumer_key(Consumer)}
   | Params
   ].
+
+unix_timestamp() ->
+  unix_timestamp(calendar:universal_time()).
+
+unix_timestamp(DateTime) ->
+  unix_seconds(DateTime) - unix_epoch().
+
+unix_epoch() ->
+  unix_seconds({{1970,1,1},{00,00,00}}).
+
+unix_seconds(DateTime) ->
+  calendar:datetime_to_gregorian_seconds(DateTime).
 
 signature_method_string(Consumer) ->
   case signature_method(Consumer) of
