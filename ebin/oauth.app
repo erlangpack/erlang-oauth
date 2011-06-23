@@ -1,21 +1,7 @@
 {application, oauth, [
   {description, "An Erlang OAuth 1.0 implementation"},
-  {vsn, "1.1.1"},
-  {modules, [
-    oauth,
-    oauth_client,
-    oauth_hmac_sha1,
-    oauth_http,
-    oauth_plaintext,
-    oauth_rsa_sha1,
-    oauth_uri
-  ]},
+  {vsn, "1.2.0"},
+  {modules, [oauth]},
   {registered, []},
-  {applications, [
-    kernel,
-    stdlib,
-    crypto,
-    public_key,
-    inets
-  ]}
+  {applications, [kernel, stdlib, crypto, public_key, inets]}
 ]}.
