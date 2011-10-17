@@ -158,8 +158,7 @@ verify_in_constant_time(X, Y) when is_list(X) and is_list(Y) ->
             verify_in_constant_time(X, Y, 0);
         false ->
             false
-    end;
-verify_in_constant_time(_X, _Y) -> false.
+    end.
 
 signature_base_string(HttpMethod, URL, Params) ->
   uri_join([HttpMethod, uri_normalize(URL), params_encode(Params)]).
