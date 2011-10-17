@@ -145,20 +145,20 @@ rsa_sha1_verify(Signature, BaseString, Consumer) ->
   Key = read_cert_key(consumer_secret(Consumer)),
   public_key:verify(to_binary(BaseString), sha, base64:decode(Signature), Key).
 
-verify_in_constant_time([X|RestX], [Y|RestY], Result) ->
-    verify_in_constant_time(RestX, RestY, (X bxor Y) bor Result);
-verify_in_constant_time([], [], Result) ->
-    Result == 0.
-
 verify_in_constant_time(<<X/binary>>, <<Y/binary>>) ->
-    verify_in_constant_time(binary_to_list(X), binary_to_list(Y));
+  verify_in_constant_time(binary_to_list(X), binary_to_list(Y));
 verify_in_constant_time(X, Y) when is_list(X) and is_list(Y) ->
-    case length(X) == length(Y) of
-        true ->
-            verify_in_constant_time(X, Y, 0);
-        false ->
-            false
-    end.
+  case length(X) == length(Y) of
+    true ->
+      verify_in_constant_time(X, Y, 0);
+    false ->
+      false
+  end.
+
+verify_in_constant_time([X | RestX], [Y | RestY], Result) ->
+  verify_in_constant_time(RestX, RestY, (X bxor Y) bor Result);
+verify_in_constant_time([], [], Result) ->
+  Result == 0.
 
 signature_base_string(HttpMethod, URL, Params) ->
   uri_join([HttpMethod, uri_normalize(URL), params_encode(Params)]).
