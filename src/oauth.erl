@@ -113,7 +113,7 @@ plaintext_signature(Consumer, TokenSecret) ->
   uri_join([consumer_secret(Consumer), TokenSecret]).
 
 plaintext_verify(Signature, Consumer, TokenSecret) ->
-  Signature =:= plaintext_signature(Consumer, TokenSecret).
+  verify_in_constant_time(Signature, plaintext_signature(Consumer, TokenSecret)).
 
 hmac_sha1_signature(HttpMethod, URL, Params, Consumer, TokenSecret) ->
   BaseString = signature_base_string(HttpMethod, URL, Params),
