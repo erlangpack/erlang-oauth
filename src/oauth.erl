@@ -1,5 +1,7 @@
 -module(oauth).
 
+-include("oauth.hrl").
+
 -export([get/3, get/5, get/6, post/3, post/5, post/6, uri/2, header/1,
   sign/6, params_decode/1, token/1, token_secret/1, verify/6]).
 
@@ -49,13 +51,13 @@ token(Params) ->
 token_secret(Params) ->
   proplists:get_value("oauth_token_secret", Params).
 
-consumer_key(_Consumer={Key, _, _}) ->
+consumer_key(#oauth_consumer{key = Key}) ->
   Key.
 
-consumer_secret(_Consumer={_, Secret, _}) ->
+consumer_secret(#oauth_consumer{secret = Secret}) ->
   Secret.
 
-signature_method(_Consumer={_, _, Method}) ->
+signature_method(#oauth_consumer{method = Method}) ->
   Method.
 
 sign(HttpMethod, URL, Params, Consumer, Token, TokenSecret) ->
