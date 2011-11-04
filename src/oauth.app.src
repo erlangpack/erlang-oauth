@@ -10,6 +10,7 @@
       stdlib,
       crypto,
       public_key,
+      ssl,
       inets
     ]}
 ]}.
