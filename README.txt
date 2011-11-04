@@ -4,47 +4,49 @@ Quick start (client usage):
 
   $ make
   ...
-  $ erl -pa ebin -s crypto -s inets
+  $ erl -pa ebin -s crypto -s inets -s ssl
   ...
-  1> Consumer = {"key", "secret", hmac_sha1}.
+  1> rr(oauth).
   ...
-  2> RequestTokenURL = "http://term.ie/oauth/example/request_token.php".
+  2> Consumer = #oauth_consumer{key = "key", secret = "secret", method = hmac_sha1}.
   ...
-  3> {ok, RequestTokenResponse} = oauth:get(RequestTokenURL, [], Consumer).
+  3> RequestTokenURL = "http://term.ie/oauth/example/request_token.php".
   ...
-  4> RequestTokenParams = oauth:params_decode(RequestTokenResponse).
+  4> {ok, RequestTokenResponse} = oauth:get(RequestTokenURL, [], Consumer).
   ...
-  5> RequestToken = oauth:token(RequestTokenParams).
+  5> RequestTokenParams = oauth:params_decode(RequestTokenResponse).
   ...
-  6> RequestTokenSecret = oauth:token_secret(RequestTokenParams).
+  6> RequestToken = oauth:token(RequestTokenParams).
   ...
-  7> AccessTokenURL = "http://term.ie/oauth/example/access_token.php".
+  7> RequestTokenSecret = oauth:token_secret(RequestTokenParams).
   ...
-  8> {ok, AccessTokenResponse} = oauth:get(AccessTokenURL, [], Consumer, RequestToken, RequestTokenSecret).
+  8> AccessTokenURL = "http://term.ie/oauth/example/access_token.php".
   ...
-  9> AccessTokenParams = oauth:params_decode(AccessTokenResponse).
+  9> {ok, AccessTokenResponse} = oauth:get(AccessTokenURL, [], Consumer, RequestToken, RequestTokenSecret).
   ...
-  10> AccessToken = oauth:token(AccessTokenParams).
+  10> AccessTokenParams = oauth:params_decode(AccessTokenResponse).
   ...
-  11> AccessTokenSecret = oauth:token_secret(AccessTokenParams).
+  11> AccessToken = oauth:token(AccessTokenParams).
   ...
-  12> URL = "http://term.ie/oauth/example/echo_api.php".
+  12> AccessTokenSecret = oauth:token_secret(AccessTokenParams).
   ...
-  13> {ok, Response} = oauth:get(URL, [{"hello", "world"}], Consumer, AccessToken, AccessTokenSecret).
+  13> URL = "http://term.ie/oauth/example/echo_api.php".
   ...
-  14> oauth:params_decode(Response).
+  14> {ok, Response} = oauth:get(URL, [{"hello", "world"}], Consumer, AccessToken, AccessTokenSecret).
+  ...
+  15> oauth:params_decode(Response).
   ...
 
 
 Consumer credentials are represented as follows:
 
-  {Key::string(), Secret::string(), plaintext}
+  #oauth_consumer{key = Key::string(), secret = Secret::string(), method = plaintext}
 
-  {Key::string(), Secret::string(), hmac_sha1}
+  #oauth_consumer{key = Key::string(), key = Secret::string(), key = hmac_sha1}
 
-  {Key::string(), RSAPrivateKeyPath::string(), rsa_sha1}  % client side
+  #oauth_consumer{key = Key::string(), key = RSAPrivateKeyPath::string(), key = rsa_sha1}  % client side
 
-  {Key::string(), RSACertificatePath::string(), rsa_sha1}  % server side
+  #oauth_consumer{key = Key::string(), key = RSACertificatePath::string(), key = rsa_sha1}  % server side
 
 
 The percent encoding/decoding implementations are based on those found in
