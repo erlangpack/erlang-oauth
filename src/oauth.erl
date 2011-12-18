@@ -228,6 +228,8 @@ header_param_decode(Param) ->
 
 uri_normalize(URI) ->
   case http_uri:parse(URI) of
+    {ok, {Scheme, UserInfo, Host, Port, Path, _Query}} -> % R15B
+      uri_normalize(Scheme, UserInfo, string:to_lower(Host), Port, [Path]);
     {Scheme, UserInfo, Host, Port, Path, _Query} ->
       uri_normalize(Scheme, UserInfo, string:to_lower(Host), Port, [Path]);
     Else ->
