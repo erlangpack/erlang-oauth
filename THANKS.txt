@@ -11,3 +11,5 @@ Thanks to the following for patches and suggestions:
 * Paul Bonser <github.com/pib>
 
 * Roberto Aloi <github.com/prof3ta>
+
+* naoya_t <github.com/naoyat>
