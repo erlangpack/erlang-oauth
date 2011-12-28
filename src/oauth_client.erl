@@ -113,7 +113,7 @@ handle_call({get_request_token, URL, Params, ParamsMethod}, _From, State={Consum
   case oauth_get(ParamsMethod, URL, Params, Consumer, "", "") of
     {ok, "200", _Headers, Body} ->
       RParams = oauth_uri:params_from_string(Body),
-      {reply, {ok, oauth:token()}, {Consumer, RParams}};
+      {reply, {ok, oauth:token(RParams)}, {Consumer, RParams}};
     {ok, ErrorCode, Headers, Body} ->
       {reply, {http_error, {ErrorCode, Headers, Body}}, State};
     Error ->
