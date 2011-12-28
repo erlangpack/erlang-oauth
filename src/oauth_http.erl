@@ -1,6 +1,6 @@
 -module(oauth_http).
 
--export([get/1, get/2, post/2, post/3, delete/1, delete/2, response_params/1, response_body/1, response_code/1]).
+-export([get/1, get/2, post/2, post/3, delete/1, delete/2]).
 
 -type http_status() :: {string(), integer(), string()}.
 
@@ -8,38 +8,23 @@
 get(URL) ->
   get(URL, []).
 
--spec get(string(), [proplists:property()]) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+-spec get(string(), [proplists:property()]) -> ibrowse:response().
 get(URL, Options) ->
-  request(get, {URL, []}, Options).
+  ibrowse:send_req(URL, [], get, [], [{ssl_options, [{ssl_imp, old}]}|Options]).
 
--spec post(string(), term()) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+-spec post(string(), term()) -> ibrowse:response().
 post(URL, Data) ->
   post(URL, Data, []).
 
--spec post(string(), term(), [proplists:property()]) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+-spec post(string(), term(), [proplists:property()]) -> ibrowse:response().
 post(URL, Data, Options) ->
-  request(post, {URL, [], "application/x-www-form-urlencoded", Data}, Options).
-
+  ibrowse:send_req(URL, [], get, Data, [{ssl_options, [{ssl_imp, old}]},
+                                        {content_type, "application/x-www-form-urlencoded"} | Options]).
+  
 -spec delete(string()) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 delete(URL) ->
   delete(URL, []).
 
 -spec delete(string(), [proplists:property()]) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 delete(URL, Options) ->
-  request(delete, {URL, []}, Options).
-
--spec request(get|post, tuple(), [proplists:property()]) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
-request(Method, Request, Options) ->
-  httpc:request(Method, Request, [{autoredirect, false}, {ssl, [{ssl_imp, old}]}], Options).
-
--spec response_params({http_status(), [{string(), string()}], string()}) -> [{string(), string()}].
-response_params(Response) ->
-  oauth_uri:params_from_string(response_body(Response)).
-
--spec response_body({http_status(), [{string(), string()}], string()}) -> string().
-response_body({{_, _, _}, _, Body}) ->
-  Body.
-
--spec response_code({http_status(), [{string(), string()}], string()}) -> integer().
-response_code({{_, Code, _}, _, _}) ->
-  Code.
+  ibrowse:send_req(URL, [], delete, [], [{ssl_options, [{ssl_imp, old}]}|Options]).

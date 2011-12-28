@@ -91,9 +91,10 @@ stop(Client) ->
 
 oauth_get(header, URL, Params, Consumer, Token, TokenSecret) ->
   Signed = oauth:signed_params("GET", URL, Params, Consumer, Token, TokenSecret),
-  {AuthorizationParams, QueryParams} = lists:partition(fun({K, _}) -> lists:prefix("oauth_", K) end, Signed),
-  Request = {oauth:uri(URL, QueryParams), [oauth:header(AuthorizationParams)]},
-  httpc:request(get, Request, [{autoredirect, false}, {ssl, [{ssl_imp, old}]}], []);
+  {AuthorizationParams, QueryParams} =
+    lists:partition(fun({K, _}) -> lists:prefix("oauth_", K) end, Signed),
+  ibrowse:send_req(oauth:uri(URL, QueryParams), [oauth:header(AuthorizationParams)], get, [],
+                   [{connect_timeout, infinity}, {ssl_options, [{ssl_imp, old}]}]);
 oauth_get(querystring, URL, Params, Consumer, Token, TokenSecret) ->
   oauth:get(URL, Params, Consumer, Token, TokenSecret).
 
@@ -110,51 +111,42 @@ init(Consumer) ->
 -spec handle_call(term(), reference(), state()) -> {reply, term(), state()}.
 handle_call({get_request_token, URL, Params, ParamsMethod}, _From, State={Consumer}) ->
   case oauth_get(ParamsMethod, URL, Params, Consumer, "", "") of
-    {ok, Response} ->
-      case oauth_http:response_code(Response) of
-        200 ->
-          RParams = oauth_http:response_params(Response),
-          {reply, {ok, oauth:token(RParams)}, {Consumer, RParams}};
-        _ ->
-          {reply, Response, State}
-      end;
+    {ok, "200", _Headers, Body} ->
+      RParams = oauth_uri:params_from_string(Body),
+      {reply, {ok, oauth:token()}, {Consumer, RParams}};
+    {ok, ErrorCode, Headers, Body} ->
+      {reply, {http_error, {ErrorCode, Headers, Body}}, State};
     Error ->
       {reply, Error, State}
   end;
 handle_call({get_access_token, URL, Params, ParamsMethod}, _From, State={Consumer, RParams}) ->
   case oauth_get(ParamsMethod, URL, Params, Consumer, oauth:token(RParams), oauth:token_secret(RParams)) of
-    {ok, Response} ->
-      case oauth_http:response_code(Response) of
-        200 ->
-          AParams = oauth_http:response_params(Response),
-          {reply, ok, {Consumer, RParams, AParams}};
-        _ ->
-          {reply, Response, State}
-      end;
+    {ok, "200", _Headers, Body} ->
+      AParams = oauth_uri:params_from_string(Body),
+      {reply, ok, {Consumer, RParams, AParams}};
+    {ok, ErrorCode, Headers, Body} ->
+      {reply, {http_error, {ErrorCode, Headers, Body}}, State};
     Error ->
       {reply, Error, State}
   end;
 handle_call({get, URL, Params, ParamsMethod}, _From, State={Consumer, _RParams, AParams}) ->
   case oauth_get(ParamsMethod, URL, Params, Consumer, oauth:token(AParams), oauth:token_secret(AParams)) of
-    {ok, Response={{_, Status, _}, Headers, Body}} ->
-      case Status of
-        200 ->
-          case proplists:get_value("content-type", Headers) of
-            undefined ->
-              {reply, {ok, Headers, Body}, State};
-            ContentType ->
-              MediaType = hd(string:tokens(ContentType, ";")),
-              case lists:suffix("/xml", MediaType) orelse lists:suffix("+xml", MediaType) of
-                true ->
-                  {XML, []} = xmerl_scan:string(Body),
-                  {reply, {ok, Headers, XML}, State};
-                false ->
-                  {reply, {ok, Headers, Body}, State}
-              end
-          end;
-        _ ->
-          {reply, Response, State}
+    {ok, "200", Headers, Body} ->
+      case proplists:get_value("Content-Type", Headers) of
+        undefined ->
+          {reply, {ok, Headers, Body}, State};
+        ContentType ->
+          MediaType = hd(string:tokens(ContentType, ";")),
+          case lists:suffix("/xml", MediaType) orelse lists:suffix("+xml", MediaType) of
+            true ->
+              {XML, []} = xmerl_scan:string(Body),
+              {reply, {ok, Headers, XML}, State};
+            false ->
+              {reply, {ok, Headers, Body}, State}
+          end
       end;
+    {ok, ErrorCode, Headers, Body} ->
+      {reply, {http_error, {ErrorCode, Headers, Body}}, State};
     Error ->
       {reply, Error, State}
   end;

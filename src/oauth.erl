@@ -19,29 +19,29 @@
   , verify/6
   ]).
 
--spec get(string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+-spec get(string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> ibrowse:response().
 get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
   get(URL, ExtraParams, Consumer, Token, TokenSecret, []).
 
--spec get(string(), [proplists:property()], oauth_client:consumer(), string(), string(), [proplists:property()]) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+-spec get(string(), [proplists:property()], oauth_client:consumer(), string(), string(), [proplists:property()]) -> ibrowse:response().
 get(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = signed_params("GET", URL, ExtraParams, Consumer, Token, TokenSecret),
   oauth_http:get(uri(URL, SignedParams), HttpcOptions).
 
--spec post(string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+-spec post(string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> ibrowse:response().
 post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
   post(URL, ExtraParams, Consumer, Token, TokenSecret, []).
 
--spec post(string(), [proplists:property()], oauth_client:consumer(), string(), string(), [proplists:property()]) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+-spec post(string(), [proplists:property()], oauth_client:consumer(), string(), string(), [proplists:property()]) -> ibrowse:response().
 post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = signed_params("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
   oauth_http:post(URL, oauth_uri:params_to_string(SignedParams), HttpcOptions).
 
--spec delete(string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+-spec delete(string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> ibrowse:response().
 delete(URL, ExtraParams, Consumer, Token, TokenSecret) ->
   delete(URL, ExtraParams, Consumer, Token, TokenSecret, []).
 
--spec delete(string(), [proplists:property()], oauth_client:consumer(), string(), string(), [proplists:property()]) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+-spec delete(string(), [proplists:property()], oauth_client:consumer(), string(), string(), [proplists:property()]) -> ibrowse:response().
 delete(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = signed_params("DELETE", URL, ExtraParams, Consumer, Token, TokenSecret),
   oauth_http:delete(uri(URL, SignedParams), HttpcOptions).
