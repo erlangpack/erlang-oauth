@@ -43,7 +43,7 @@ delete(URL, ExtraParams, Consumer, Token, TokenSecret) ->
 
 -spec delete(string(), [proplists:property()], oauth_client:consumer(), string(), string(), [proplists:property()]) -> {ok, {Status::tuple(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 delete(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
-  SignedParams = signed_params("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
+  SignedParams = signed_params("DELETE", URL, ExtraParams, Consumer, Token, TokenSecret),
   oauth_http:delete(uri(URL, SignedParams), HttpcOptions).
 
 -spec uri(string(), [proplists:property()]) -> string().
