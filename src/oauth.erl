@@ -22,6 +22,7 @@
 
 -spec start() -> ok.
 start() ->
+  ssl:start(),
   ibrowse:start().
 
 -spec get(string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> ibrowse:response().
