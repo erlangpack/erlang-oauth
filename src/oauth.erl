@@ -17,7 +17,12 @@
   , token_secret_param/2
   , uri/2
   , verify/6
+  , start/0
   ]).
+
+-spec start() -> ok.
+start() ->
+  ibrowse:start().
 
 -spec get(string(), [proplists:property()], oauth_client:consumer(), string(), string()) -> ibrowse:response().
 get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
