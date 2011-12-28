@@ -1,6 +1,6 @@
 -module(oauth_http).
 
--export([get/1, get/2, post/2, post/3, response_params/1, response_body/1, response_code/1]).
+-export([get/1, get/2, post/2, post/3, delete/1, delete/2, response_params/1, response_body/1, response_code/1]).
 
 -type http_status() :: {string(), integer(), string()}.
 
@@ -19,6 +19,14 @@ post(URL, Data) ->
 -spec post(string(), term(), [proplists:property()]) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 post(URL, Data, Options) ->
   request(post, {URL, [], "application/x-www-form-urlencoded", Data}, Options).
+
+-spec delete(string()) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+delete(URL) ->
+  delete(URL, []).
+
+-spec delete(string(), [proplists:property()]) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
+delete(URL, Options) ->
+  request(delete, {URL, []}, Options).
 
 -spec request(get|post, tuple(), [proplists:property()]) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 request(Method, Request, Options) ->
