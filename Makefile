@@ -1,5 +1,11 @@
-all:
-	@erl -make
+REBAR=`which rebar || ./rebar`
+
+.PHONY: deps
+
+all: compile
+
+compile:
+	@$(REBAR) compile
 
 clean:
-	@rm -rf ebin/*.beam erl_crash.dump
+	@$(REBAR) clean
