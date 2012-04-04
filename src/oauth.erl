@@ -5,7 +5,7 @@
 
 -export([plaintext_signature/2, hmac_sha1_signature/5,
   hmac_sha1_signature/3, rsa_sha1_signature/4, rsa_sha1_signature/2,
-  signature_base_string/3, params_encode/1]).
+  signature_base_string/3, params_encode/1, signature/5]).
 
 -export([plaintext_verify/3, hmac_sha1_verify/6, hmac_sha1_verify/4,
   rsa_sha1_verify/5, rsa_sha1_verify/3]).
