@@ -57,7 +57,7 @@ put(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile) 
   post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile, "application/x-www-form-urlencoded").
 
 put(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile, ContentType) ->
-  SignedParams = sign("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
+  SignedParams = sign("PUT", URL, ExtraParams, Consumer, Token, TokenSecret),
   http_put(URL, uri_params_encode(SignedParams), HttpcOptions, HttpcProfile, ContentType).
  
 uri(Base, []) ->
