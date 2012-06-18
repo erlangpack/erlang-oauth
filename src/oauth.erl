@@ -1,7 +1,7 @@
 -module(oauth).
 
--export([get/3, get/5, get/6, post/3, post/5, post/6, uri/2, header/1,
-  sign/6, params_decode/1, token/1, token_secret/1, verify/6]).
+-export([get/3, get/5, get/6, get/7, post/3, post/5, post/6, post/7, post/8,
+  uri/2, header/1, sign/6, params_decode/1, token/1, token_secret/1, verify/6]).
 
 -export([plaintext_signature/2, hmac_sha1_signature/5,
   hmac_sha1_signature/3, rsa_sha1_signature/4, rsa_sha1_signature/2,
@@ -22,8 +22,11 @@ get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
   get(URL, ExtraParams, Consumer, Token, TokenSecret, []).
 
 get(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
+  get(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, undefined).
+
+get(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile) ->
   SignedParams = sign("GET", URL, ExtraParams, Consumer, Token, TokenSecret),
-  http_get(uri(URL, SignedParams), HttpcOptions).
+  http_get(uri(URL, SignedParams), HttpcOptions, HttpcProfile).
 
 post(URL, ExtraParams, Consumer) ->
   post(URL, ExtraParams, Consumer, "", "").
@@ -32,9 +35,31 @@ post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
   post(URL, ExtraParams, Consumer, Token, TokenSecret, []).
 
 post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
-  SignedParams = sign("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
-  http_post(URL, uri_params_encode(SignedParams), HttpcOptions).
+  post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, undefined).
 
+post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile) ->
+  post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile, "application/x-www-form-urlencoded").
+
+post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile, ContentType) ->
+  SignedParams = sign("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
+  http_post(URL, uri_params_encode(SignedParams), HttpcOptions, HttpcProfile, ContentType).
+ 
+put(URL, ExtraParams, Consumer) ->
+  put(URL, ExtraParams, Consumer, "", "").
+
+put(URL, ExtraParams, Consumer, Token, TokenSecret) ->
+  post(URL, ExtraParams, Consumer, Token, TokenSecret, []).
+
+put(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
+  put(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, undefined).
+
+put(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile) ->
+  post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile, "application/x-www-form-urlencoded").
+
+put(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile, ContentType) ->
+  SignedParams = sign("PUT", URL, ExtraParams, Consumer, Token, TokenSecret),
+  http_put(URL, uri_params_encode(SignedParams), HttpcOptions, HttpcProfile, ContentType).
+ 
 uri(Base, []) ->
   Base;
 uri(Base, Params) ->
@@ -173,14 +198,22 @@ params_encode(Params) ->
 params_decode(_Response={{_, _, _}, _, Body}) ->
   uri_params_decode(Body).
 
-http_get(URL, Options) ->
-  http_request(get, {URL, []}, Options).
+http_get(URL, Options, Profile) ->
+  http_request(get, {URL, []}, Options, Profile).
 
-http_post(URL, Data, Options) ->
-  http_request(post, {URL, [], "application/x-www-form-urlencoded", Data}, Options).
+http_post(URL, Data, Options, Profile, ContentType) ->
+  http_request(post, {URL, [], ContentType, Data}, Options, Profile).
 
-http_request(Method, Request, Options) ->
-  httpc:request(Method, Request, [{autoredirect, false}], Options).
+http_put(URL, Data, Options, Profile, ContentType) ->
+  http_request(put, {URL, [], ContentType, Data}, Options, Profile).
+ 
+http_request(Method, Request, Options, Profile) ->
+  case Profile of
+    undefined ->
+      httpc:request(Method, Request, [{autoredirect, false}], Options);
+    _Other ->
+      httpc:request(Method, Request, [{autoredirect, false}], Options, Profile)
+  end.
 
 unix_timestamp() ->
   unix_timestamp(calendar:universal_time()).
