@@ -43,7 +43,23 @@ post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile)
 post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile, ContentType) ->
   SignedParams = sign("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
   http_post(URL, uri_params_encode(SignedParams), HttpcOptions, HttpcProfile, ContentType).
+ 
+put(URL, ExtraParams, Consumer) ->
+  put(URL, ExtraParams, Consumer, "", "").
 
+put(URL, ExtraParams, Consumer, Token, TokenSecret) ->
+  post(URL, ExtraParams, Consumer, Token, TokenSecret, []).
+
+put(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
+  put(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, undefined).
+
+put(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile) ->
+  post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile, "application/x-www-form-urlencoded").
+
+put(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcProfile, ContentType) ->
+  SignedParams = sign("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
+  http_put(URL, uri_params_encode(SignedParams), HttpcOptions, HttpcProfile, ContentType).
+ 
 uri(Base, []) ->
   Base;
 uri(Base, Params) ->
@@ -188,6 +204,9 @@ http_get(URL, Options, Profile) ->
 http_post(URL, Data, Options, Profile, ContentType) ->
   http_request(post, {URL, [], ContentType, Data}, Options, Profile).
 
+http_put(URL, Data, Options, Profile, ContentType) ->
+  http_request(put, {URL, [], ContentType, Data}, Options, Profile).
+ 
 http_request(Method, Request, Options, Profile) ->
   case Profile of
     undefined ->
