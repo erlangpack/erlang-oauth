@@ -1,6 +1,11 @@
+# [v1.3.0](https://github.com/tim/erlang-oauth/tree/v1.3.0) (2012-09-13) [9035960](https://github.com/tim/erlang-oauth/commit/9035960a0d30a8b3909d9f4d7e9a837aac8a696c)
+
+  * Added oauth:put/6 and oauth:put/7 functions
+
+
 # [v1.2.2](https://github.com/tim/erlang-oauth/tree/v1.2.2) (2011-11-18) [994f3d4](https://github.com/tim/erlang-oauth/commit/994f3d497ceea784b78e81b2aa93eaedfee2fbf8)
 
-  * Add support for new tagged tuple returned by http_uri:parse/1 (R15B)
+  * Added support for new tagged tuple returned by http_uri:parse/1 (R15B)
 
 
 # [v1.2.1](https://github.com/tim/erlang-oauth/tree/v1.2.1) (2011-10-17) [7969309](https://github.com/tim/erlang-oauth/commit/7969309dd61afb180a544ab941b189fde389c430)
