@@ -23,7 +23,7 @@ get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
 
 get(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = sign("GET", URL, ExtraParams, Consumer, Token, TokenSecret),
-  http_get(uri(URL, SignedParams), HttpcOptions).
+  http_request(get, {uri(URL, SignedParams), []}, HttpcOptions).
 
 post(URL, ExtraParams, Consumer) ->
   post(URL, ExtraParams, Consumer, "", "").
@@ -33,14 +33,14 @@ post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
 
 post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = sign("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
-  http_post(URL, uri_params_encode(SignedParams), HttpcOptions).
+  http_request(post, {URL, [], "application/x-www-form-urlencoded", uri_params_encode(SignedParams)}, HttpcOptions).
 
 put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret) ->
   put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, []).
 
 put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = sign("PUT", URL, ExtraParams, Consumer, Token, TokenSecret),
-  http_put(uri(URL, SignedParams), [], {ContentType, Body}, HttpcOptions).
+  http_request(put, {uri(URL, SignedParams), [], ContentType, Body}, HttpcOptions).
 
 uri(Base, []) ->
   Base;
@@ -179,15 +179,6 @@ params_encode(Params) ->
 
 params_decode(_Response={{_, _, _}, _, Body}) ->
   uri_params_decode(Body).
-
-http_get(URL, Options) ->
-  http_request(get, {URL, []}, Options).
-
-http_post(URL, Data, Options) ->
-  http_request(post, {URL, [], "application/x-www-form-urlencoded", Data}, Options).
-
-http_put(URL, Headers, {ContentType, Body}, Options) ->
-  http_request(put, {URL, Headers, ContentType, Body}, Options).
 
 http_request(Method, Request, Options) ->
   httpc:request(Method, Request, [{autoredirect, false}], Options).
