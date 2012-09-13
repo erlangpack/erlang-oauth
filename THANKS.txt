@@ -12,4 +12,6 @@ Thanks to the following for patches and suggestions:
 
 * Roberto Aloi <github.com/prof3ta>
 
+* Ryan Flynn <github.com/rflynn>
+
 * naoya_t <github.com/naoyat>
