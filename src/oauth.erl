@@ -36,7 +36,7 @@ post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   http_post(URL, uri_params_encode(SignedParams), HttpcOptions).
 
 put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret) ->
-    put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, []).
+  put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, []).
 
 put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = sign("PUT", URL, ExtraParams, Consumer, Token, TokenSecret),
