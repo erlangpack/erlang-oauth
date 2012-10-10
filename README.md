@@ -35,6 +35,18 @@
     14> oauth:params_decode(Response).
     ...
 
+
+## Dependency management with [rebar](https://github.com/basho/rebar)
+
+You can add erlang-oauth as a dependency to your rebar.config file like this:
+
+    {deps, [
+      {oauth, ".*", {git, "https://github.com/tim/erlang-oauth.git"}}
+    ]}.
+
+Please consult the [relevant rebar wiki page](https://github.com/basho/rebar/wiki/Dependency-management) for more information.
+
+
 ## Notes
 
 Consumer credentials are represented as follows:
