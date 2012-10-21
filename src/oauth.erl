@@ -280,17 +280,7 @@ uri_encode(Term) when is_integer(Term) ->
 uri_encode(Term) when is_atom(Term) ->
   uri_encode(atom_to_list(Term));
 uri_encode(Term) when is_list(Term) ->
-  uri_encode(lists:reverse(Term, []), []).
-
--define(is_alphanum(C), C >= $A, C =< $Z; C >= $a, C =< $z; C >= $0, C =< $9).
-
-uri_encode([X | T], Acc) when ?is_alphanum(X); X =:= $-; X =:= $_; X =:= $.; X =:= $~ ->
-  uri_encode(T, [X | Acc]);
-uri_encode([X | T], Acc) ->
-  NewAcc = [$%, dec2hex(X bsr 4), dec2hex(X band 16#0f) | Acc],
-  uri_encode(T, NewAcc);
-uri_encode([], Acc) ->
-  Acc.
+  edoc_lib:escape_uri(Term).
 
 uri_decode(Str) when is_list(Str) ->
   uri_decode(Str, []).
@@ -302,12 +292,7 @@ uri_decode([X | T], Acc) ->
 uri_decode([], Acc) ->
   lists:reverse(Acc, []).
 
--compile({inline, [{dec2hex, 1}, {hex2dec, 1}]}).
-
-dec2hex(N) when N >= 10 andalso N =< 15 ->
-  N + $A - 10;
-dec2hex(N) when N >= 0 andalso N =< 9 ->
-  N + $0.
+-compile({inline, [{hex2dec, 1}]}).
 
 hex2dec(C) when C >= $A andalso C =< $F ->
   C - $A + 10;
