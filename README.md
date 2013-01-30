@@ -63,15 +63,15 @@ and [OAuth Core 1.0 Revision A](http://oauth.net/core/1.0a/). It is *not* intend
 to cover [OAuth 2.0](http://oauth.net/2/).
 
 
-## Erlang/OTP compatibility
+## OTP compatibility
 
 Erlang/OTP R14B or greater.
 
 
 ## [Rebar](https://github.com/basho/rebar) compatibility
 
-This implementation should be fully compatible with rebar. You can add
-erlang-oauth as a dependency to your rebar.config file like this:
+This implementation should be fully compatible with rebar. Add erlang-oauth
+as a dependency to your rebar.config file like this:
 
     {deps, [
       {oauth, ".*", {git, "https://github.com/tim/erlang-oauth.git"}}
