@@ -1,4 +1,8 @@
-# An Erlang OAuth implementation
+# erlang-oauth
+
+An Erlang OAuth 1.0 implementation. Includes functions for generating signatures
+(client side), verifying signatures (server side), and some convenience functions
+for making OAuth HTTP requests (client side).
 
 ## Quick start (client usage)
 
@@ -36,31 +40,58 @@
     ...
 
 
-## Dependency management with [rebar](https://github.com/basho/rebar)
+## OAuth consumer representation
 
-You can add erlang-oauth as a dependency to your rebar.config file like this:
+Consumers are represented using tuples:
+
+```erlang
+{Key::string(), Secret::string(), plaintext}
+
+{Key::string(), Secret::string(), hmac_sha1}
+
+{Key::string(), RSAPrivateKeyPath::string(), rsa_sha1}  % client side
+
+{Key::string(), RSACertificatePath::string(), rsa_sha1}  % server side
+```
+
+
+## OAuth compatibility
+
+This implementation should be compatible with the signature algorithms
+presented in [RFC5849 - The OAuth 1.0 Protocol](http://tools.ietf.org/html/rfc5849),
+and [OAuth Core 1.0 Revision A](http://oauth.net/core/1.0a/). It is *not* intended
+to cover [OAuth 2.0](http://oauth.net/2/).
+
+
+## Erlang/OTP compatibility
+
+Erlang/OTP R14B or greater.
+
+
+## [Rebar](https://github.com/basho/rebar) compatibility
+
+This implementation should be fully compatible with rebar. You can add
+erlang-oauth as a dependency to your rebar.config file like this:
 
     {deps, [
       {oauth, ".*", {git, "https://github.com/tim/erlang-oauth.git"}}
     ]}.
 
-Please consult the [relevant rebar wiki page](https://github.com/basho/rebar/wiki/Dependency-management) for more information.
+Please consult the [relevant rebar wiki page](https://github.com/basho/rebar/wiki/Dependency-management)
+for more information.
 
 
-## Notes
+## Other notes
 
-Consumer credentials are represented as follows:
+This is *not* a "plug and play" server implementation. In order to implement OAuth
+correctly as a provider you have more work to do: token storage, nonce and timestamp
+verification etc.
 
-    {Key::string(), Secret::string(), plaintext}
-
-    {Key::string(), Secret::string(), hmac_sha1}
-
-    {Key::string(), RSAPrivateKeyPath::string(), rsa_sha1}  % client side
-
-    {Key::string(), RSACertificatePath::string(), rsa_sha1}  % server side
-
-
-Erlang/OTP R14B or greater is required for RSA-SHA1
+This is *not* a "bells and whistles" HTTP client. If you need fine grained control
+over your HTTP requests or you prefer to use something other than inets/httpc then you
+will need to assemble the requests yourself. Use `oauth:sign/6` to generate a list of
+signed OAuth parameters, `oauth:uri_params_encode/1` or `oauth:header_params_encode/1` to
+encode the parameters, and then assemble the request using your HTTP client of choice.
 
 The percent encoding/decoding implementations are based on [ibrowse](https://github.com/cmullaparthi/ibrowse)
 
