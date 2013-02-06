@@ -18,9 +18,8 @@ post(URL, Data) ->
 
 -spec post(string(), term(), [proplists:property()]) -> ibrowse:response().
 post(URL, Data, Options) ->
-  ibrowse:send_req(URL, [], post, Data,
-                   [{ssl_options, [{ssl_imp, old}]},
-                    {content_type, "application/x-www-form-urlencoded"} | Options]).
+  ibrowse:send_req(URL, [{content_type, "application/x-www-form-urlencoded"}], post, Data,
+                   [{ssl_options, [{ssl_imp, old}]} | Options]).
   
 -spec delete(string()) -> {ok, {Status::http_status(), Headers::[{string(), string()}], Body::string()}} | {error, term()}.
 delete(URL) ->
