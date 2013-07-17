@@ -263,7 +263,7 @@ uri_join(Values) ->
   uri_join(Values, "&").
 
 uri_join(Values, Separator) ->
-  string:join([uri_encode(Value) || Value <- Values], Separator).
+  string:join(lists:map(fun uri_encode/1, Values), Separator).
 
 intercalate(Sep, Xs) ->
   lists:concat(intersperse(Sep, Xs)).
