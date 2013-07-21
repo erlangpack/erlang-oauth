@@ -1,0 +1,9 @@
+% cf. http://wiki.oauth.net/TestCases
+
+{signature, "VZVjXceV7JgPq/dOTnNmEfO0Fv8="}.
+
+{base_string, "bs"}.
+
+{consumer, {"", "cs", hmac_sha1}}.
+
+{token_secret, "ts"}.

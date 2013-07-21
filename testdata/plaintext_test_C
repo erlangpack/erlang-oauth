@@ -1,0 +1,7 @@
+% cf. http://oauth.net/core/1.0/#rfc.section.9.4.1
+
+{signature, "djr9rjt0jd78jf88&"}.
+
+{consumer, {"", "djr9rjt0jd78jf88", plaintext}}.
+
+{token_secret, ""}.

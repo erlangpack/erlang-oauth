@@ -1,0 +1,13 @@
+{base_string, "POST&https%3A%2F%2Fphotos.example.net%2Frequest_token&oauth_consumer_key%3Ddpf43f3p2l4k3l03%26oauth_nonce%3Dhsu94j3884jdopsl%26oauth_signature_method%3DPLAINTEXT%26oauth_timestamp%3D1191242090%26oauth_version%3D1.0"}.
+
+{method, "POST"}.
+
+{url, "https://photos.example.net/request_token"}.
+
+{params, [
+  {"oauth_version", "1.0"},
+  {"oauth_consumer_key", "dpf43f3p2l4k3l03"},
+  {"oauth_timestamp", "1191242090"},
+  {"oauth_nonce", "hsu94j3884jdopsl"},
+  {"oauth_signature_method", "PLAINTEXT"}
+]}.
