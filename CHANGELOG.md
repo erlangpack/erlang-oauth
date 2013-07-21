@@ -1,3 +1,10 @@
+# [v1.4.0](https://github.com/tim/erlang-oauth/tree/v1.4.0) (2013-07-21)
+
+  * Added support form new crypto:hmac/3 function
+
+  * Moved unit tests from github.com/tim/erlang-oauth-tests
+
+
 # [v1.3.0](https://github.com/tim/erlang-oauth/tree/v1.3.0) (2012-09-13)
 
   * Added oauth:put/6 and oauth:put/7 functions
