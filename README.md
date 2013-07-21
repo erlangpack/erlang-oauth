@@ -96,5 +96,3 @@ encode the parameters, and then assemble the request using your HTTP client of c
 The percent encoding/decoding implementations are based on [ibrowse](https://github.com/cmullaparthi/ibrowse)
 
 Example client/server code: [github.com/tim/erlang-oauth-examples](https://github.com/tim/erlang-oauth-examples)
-
-Unit tests: [github.com/tim/erlang-oauth-tests](https://github.com/tim/erlang-oauth-tests)
