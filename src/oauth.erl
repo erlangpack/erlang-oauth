@@ -156,9 +156,11 @@ rsa_sha1_verify(Signature, HttpMethod, URL, Params, Consumer) ->
   BaseString = signature_base_string(HttpMethod, URL, Params),
   rsa_sha1_verify(Signature, BaseString, Consumer).
 
-rsa_sha1_verify(Signature, BaseString, Consumer) ->
+rsa_sha1_verify(Signature, BaseString, Consumer) when is_binary(BaseString) ->
   Key = read_cert_key(consumer_secret(Consumer)),
-  public_key:verify(to_binary(BaseString), sha, base64:decode(Signature), Key).
+  public_key:verify(BaseString, sha, base64:decode(Signature), Key);
+rsa_sha1_verify(Signature, BaseString, Consumer) when is_list(BaseString) ->
+  rsa_sha1_verify(Signature, list_to_binary(BaseString), Consumer).
 
 verify_in_constant_time(<<X/binary>>, <<Y/binary>>) ->
   verify_in_constant_time(binary_to_list(X), binary_to_list(Y));
@@ -211,11 +213,6 @@ read_private_key(Path) ->
   {ok, Contents} = file:read_file(Path),
   [Info] = public_key:pem_decode(Contents),
   public_key:pem_entry_decode(Info).
-
-to_binary(Term) when is_list(Term) ->
-  list_to_binary(Term);
-to_binary(Term) when is_binary(Term) ->
-  Term.
 
 header_params_encode(Params) ->
   intercalate(", ", [lists:concat([uri_encode(K), "=\"", uri_encode(V), "\""]) || {K, V} <- Params]).
