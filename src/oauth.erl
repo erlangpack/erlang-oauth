@@ -191,17 +191,10 @@ params_decode(_Response={{_, _, _}, _, Body}) ->
 http_request(Method, Request, Options) ->
   httpc:request(Method, Request, [{autoredirect, false}], Options).
 
+-define(unix_epoch, 62167219200).
+
 unix_timestamp() ->
-  unix_timestamp(calendar:universal_time()).
-
-unix_timestamp(DateTime) ->
-  unix_seconds(DateTime) - unix_epoch().
-
-unix_epoch() ->
-  unix_seconds({{1970,1,1},{00,00,00}}).
-
-unix_seconds(DateTime) ->
-  calendar:datetime_to_gregorian_seconds(DateTime).
+  calendar:datetime_to_gregorian_seconds(calendar:universal_time()) - ?unix_epoch.
 
 read_cert_key(Path) when is_list(Path) ->
   {ok, Contents} = file:read_file(Path),
