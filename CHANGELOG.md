@@ -1,6 +1,11 @@
+# [v1.5.0](https://github.com/tim/erlang-oauth/tree/v1.5.0) (2014-07-25)
+
+  * Added support for encoding binary terms as parameter values
+
+
 # [v1.4.0](https://github.com/tim/erlang-oauth/tree/v1.4.0) (2013-07-21)
 
-  * Added support form new crypto:hmac/3 function
+  * Added support for new crypto:hmac/3 function
 
   * Moved unit tests from github.com/tim/erlang-oauth-tests
 
