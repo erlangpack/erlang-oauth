@@ -2,6 +2,8 @@ Thanks to the following for patches and suggestions:
 
 * András Veres-Szentkirályi <github.com/dnet>
 
+* Дамјан Георгиевски <github.com/gdamjan>
+
 * Fernando Benavides <github.com/elbrujohalcon>
 
 * Jan Lehnardt <github.com/janl>

@@ -287,6 +287,8 @@ uri_encode(Term) when is_integer(Term) ->
   integer_to_list(Term);
 uri_encode(Term) when is_atom(Term) ->
   uri_encode(atom_to_list(Term));
+uri_encode(Term) when is_binary(Term) ->
+  uri_encode(binary_to_list(Term));
 uri_encode(Term) when is_list(Term) ->
   uri_encode(lists:reverse(Term, []), []).
 
