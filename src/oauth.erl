@@ -29,6 +29,8 @@
              , key/0
              , secret/0
              , method/0
+             , token/0
+             , token_secret/0
              ]).
 
 % Types necessary for HTTP
@@ -51,7 +53,7 @@
 -type url() :: nonempty_string().
 
 %% Types necessary for Oauth logic.
--type consumer()      :: {token(), secret(), method()}.
+-type consumer()      :: {key(), secret(), method()}.
 -type key()           :: string().       
 -type secret()        :: string().
 -type method()        :: 'plaintext' | 'hmac_sha1' | 'rsa_sha1'.
