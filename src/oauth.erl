@@ -46,7 +46,7 @@
 -type httpc_request()         :: {url(), httpc_headers()} | 
                                  {url(), httpc_headers(), string(), string()}.
 -type httpc_ok_result()       :: {httpc_status_line(), httpc_headers(), string()} 
-                              | {httpc_status_code(), string()}.
+                              |  {httpc_status_code(), string()}.
 -type httpc_request_return()  :: {ok, httpc_ok_result()}
                               |  {error, term()}.
 
@@ -270,7 +270,7 @@ params_encode(Params) ->
   Concatenated = [lists:concat([K, "=", V]) || {K, V} <- Sorted],
   string:join(Concatenated, "&").
 
--spec params_decode({consumer(),_,string()}) -> params().
+-spec params_decode(httpc_ok_result()) -> params().
 params_decode(_Response={{_, _, _}, _, Body}) ->
   uri_params_decode(Body).
 
