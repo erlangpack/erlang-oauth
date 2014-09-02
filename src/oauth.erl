@@ -59,7 +59,7 @@
 -type method()        :: 'plaintext' | 'hmac_sha1' | 'rsa_sha1'.
 -type token()         :: string().
 -type token_secret()  :: string().
--type params()        :: [param(),...].
+-type params()        :: [param()].
 -type param()         :: {nonempty_string(), nonempty_string()}.
  
 -spec get(url(),params(),consumer()) -> httpc_request_return().
