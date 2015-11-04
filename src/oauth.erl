@@ -1,6 +1,6 @@
 -module(oauth).
 
--export([get/3, get/5, get/6, post/3, post/5, post/6, uri/2, header/1,
+-export([get/3, get/5, get/6, post/3, post/5, post/6, put/6, put/7, uri/2, header/1,
   sign/6, params_decode/1, token/1, token_secret/1, verify/6]).
 
 -export([plaintext_signature/2, hmac_sha1_signature/5,
@@ -29,7 +29,7 @@ get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
 
 get(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = sign("GET", URL, ExtraParams, Consumer, Token, TokenSecret),
-  http_get(uri(URL, SignedParams), HttpcOptions).
+  http_request(get, {uri(URL, SignedParams), []}, HttpcOptions).
 
 post(URL, ExtraParams, Consumer) ->
   post(URL, ExtraParams, Consumer, "", "").
@@ -39,7 +39,14 @@ post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
 
 post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = sign("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
-  http_post(URL, uri_params_encode(SignedParams), HttpcOptions).
+  http_request(post, {URL, [], "application/x-www-form-urlencoded", uri_params_encode(SignedParams)}, HttpcOptions).
+
+put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret) ->
+  put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, []).
+
+put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, HttpcOptions) ->
+  SignedParams = sign("PUT", URL, ExtraParams, Consumer, Token, TokenSecret),
+  http_request(put, {uri(URL, SignedParams), [], ContentType, Body}, HttpcOptions).
 
 uri(Base, []) ->
   Base;
@@ -147,9 +154,11 @@ rsa_sha1_verify(Signature, HttpMethod, URL, Params, Consumer) ->
   BaseString = signature_base_string(HttpMethod, URL, Params),
   rsa_sha1_verify(Signature, BaseString, Consumer).
 
-rsa_sha1_verify(Signature, BaseString, Consumer) ->
+rsa_sha1_verify(Signature, BaseString, Consumer) when is_binary(BaseString) ->
   Key = read_cert_key(consumer_secret(Consumer)),
-  public_key:verify(to_binary(BaseString), sha, base64:decode(Signature), Key).
+  public_key:verify(BaseString, sha, base64:decode(Signature), Key);
+rsa_sha1_verify(Signature, BaseString, Consumer) when is_list(BaseString) ->
+  rsa_sha1_verify(Signature, list_to_binary(BaseString), Consumer).
 
 verify_in_constant_time(<<X/binary>>, <<Y/binary>>) ->
   verify_in_constant_time(binary_to_list(X), binary_to_list(Y));
@@ -179,26 +188,13 @@ params_encode(Params) ->
 params_decode(_Response={{_, _, _}, _, Body}) ->
   uri_params_decode(Body).
 
-http_get(URL, Options) ->
-  http_request(get, {URL, []}, Options).
-
-http_post(URL, Data, Options) ->
-  http_request(post, {URL, [], "application/x-www-form-urlencoded", Data}, Options).
-
 http_request(Method, Request, Options) ->
   httpc:request(Method, Request, [{autoredirect, false}], Options).
 
+-define(unix_epoch, 62167219200).
+
 unix_timestamp() ->
-  unix_timestamp(calendar:universal_time()).
-
-unix_timestamp(DateTime) ->
-  unix_seconds(DateTime) - unix_epoch().
-
-unix_epoch() ->
-  unix_seconds({{1970,1,1},{00,00,00}}).
-
-unix_seconds(DateTime) ->
-  calendar:datetime_to_gregorian_seconds(DateTime).
+  calendar:datetime_to_gregorian_seconds(calendar:universal_time()) - ?unix_epoch.
 
 read_cert_key(Path) when is_list(Path) ->
   {ok, Contents} = file:read_file(Path),
@@ -215,11 +211,6 @@ read_private_key(Path) ->
   {ok, Contents} = file:read_file(Path),
   [Info] = public_key:pem_decode(Contents),
   public_key:pem_entry_decode(Info).
-
-to_binary(Term) when is_list(Term) ->
-  list_to_binary(Term);
-to_binary(Term) when is_binary(Term) ->
-  Term.
 
 header_params_encode(Params) ->
   intercalate(", ", [lists:concat([uri_encode(K), "=\"", uri_encode(V), "\""]) || {K, V} <- Params]).
@@ -268,7 +259,7 @@ uri_join(Values) ->
   uri_join(Values, "&").
 
 uri_join(Values, Separator) ->
-  string:join([uri_encode(Value) || Value <- Values], Separator).
+  string:join(lists:map(fun uri_encode/1, Values), Separator).
 
 intercalate(Sep, Xs) ->
   lists:concat(intersperse(Sep, Xs)).
@@ -284,6 +275,8 @@ uri_encode(Term) when is_integer(Term) ->
   integer_to_list(Term);
 uri_encode(Term) when is_atom(Term) ->
   uri_encode(atom_to_list(Term));
+uri_encode(Term) when is_binary(Term) ->
+  uri_encode(binary_to_list(Term));
 uri_encode(Term) when is_list(Term) ->
   uri_encode(lists:reverse(Term, []), []).
 
@@ -318,3 +311,4 @@ hex2dec(C) when C >= $A andalso C =< $F ->
   C - $A + 10;
 hex2dec(C) when C >= $0 andalso C =< $9 ->
   C - $0.
+
