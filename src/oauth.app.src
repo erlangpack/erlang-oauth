@@ -1,0 +1,11 @@
+{application, oauth, [
+  {description, "An Erlang OAuth 1.0 implementation"},
+  {vsn, "1.6.0"},
+  {modules, []},
+  {registered, []},
+  {applications, [kernel, stdlib, crypto, public_key, inets]},
+
+  {maintainers, ["Tim Fletcher"]},
+  {licenses, ["BSD"]},
+  {links, [{"Github", "https://github.com/tim/erlang-oauth"}]}
+]}.

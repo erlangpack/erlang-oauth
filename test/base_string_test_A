@@ -1,0 +1,7 @@
+{base_string, "GET&http%3A%2F%2Fexample.com%2F&n%3Dv"}.
+
+{method, "GET"}.
+
+{url, "http://example.com/"}.
+
+{params, [{"n", "v"}]}.
