@@ -1,6 +1,6 @@
 -module(oauth).
 
--export([get/3, get/5, get/6, post/3, post/5, post/6, put/6, put/7, uri/2, header/1,
+-export([get/3, get/5, get/6, get/7, post/3, post/5, post/6, post/7, put/6, put/7, put/8, uri/2, header/1,
   sign/6, params_decode/1, token/1, token_secret/1, verify/6]).
 
 -export([plaintext_signature/2, hmac_sha1_signature/5,
@@ -22,8 +22,11 @@ get(URL, ExtraParams, Consumer, Token, TokenSecret) ->
   get(URL, ExtraParams, Consumer, Token, TokenSecret, []).
 
 get(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
+  get(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, []).
+
+get(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcHttpOptions) ->
   SignedParams = sign("GET", URL, ExtraParams, Consumer, Token, TokenSecret),
-  http_request(get, {uri(URL, SignedParams), []}, HttpcOptions).
+  http_request(get, {uri(URL, SignedParams), []}, HttpcOptions, HttpcHttpOptions).
 
 post(URL, ExtraParams, Consumer) ->
   post(URL, ExtraParams, Consumer, "", "").
@@ -32,15 +35,21 @@ post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
   post(URL, ExtraParams, Consumer, Token, TokenSecret, []).
 
 post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
+  post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, []).
+
+post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions, HttpcHttpOptions) ->
   SignedParams = sign("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
-  http_request(post, {URL, [], "application/x-www-form-urlencoded", uri_params_encode(SignedParams)}, HttpcOptions).
+  http_request(post, {URL, [], "application/x-www-form-urlencoded", uri_params_encode(SignedParams)}, HttpcOptions, HttpcHttpOptions).
 
 put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret) ->
   put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, []).
 
 put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, HttpcOptions) ->
+  put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, HttpcOptions, []).
+
+put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, HttpcOptions, HttpcHttpOptions) ->
   SignedParams = sign("PUT", URL, ExtraParams, Consumer, Token, TokenSecret),
-  http_request(put, {uri(URL, SignedParams), [], ContentType, Body}, HttpcOptions).
+  http_request(put, {uri(URL, SignedParams), [], ContentType, Body}, HttpcOptions, HttpcHttpOptions).
 
 uri(Base, []) ->
   Base;
@@ -190,8 +199,8 @@ params_encode(Params) ->
 params_decode(_Response={{_, _, _}, _, Body}) ->
   uri_params_decode(Body).
 
-http_request(Method, Request, Options) ->
-  httpc:request(Method, Request, [{autoredirect, false}], Options).
+http_request(Method, Request, Options, HttpOptions) ->
+  httpc:request(Method, Request, [{autoredirect, false}] ++ HttpOptions, Options).
 
 -define(unix_epoch, 62167219200).
 
