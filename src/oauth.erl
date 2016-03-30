@@ -15,6 +15,12 @@
 
 -include_lib("public_key/include/public_key.hrl").
 
+-ifndef(no_sha_hmac).
+-define(SHA_HMAC(Key, Data), crypto:hmac(sha, Key, Data)).
+-else.
+-define(SHA_HMAC(Key, Data), crypto:sha_mac(Key, Data)).
+-endif.
+
 get(URL, ExtraParams, Consumer) ->
   get(URL, ExtraParams, Consumer, "", "").
 
@@ -128,21 +134,13 @@ hmac_sha1_signature(HttpMethod, URL, Params, Consumer, TokenSecret) ->
 
 hmac_sha1_signature(BaseString, Consumer, TokenSecret) ->
   Key = uri_join([consumer_secret(Consumer), TokenSecret]),
-  base64:encode_to_string(hmac_sha(Key, BaseString)).
+  base64:encode_to_string(?SHA_HMAC(Key, BaseString)).
 
 hmac_sha1_verify(Signature, HttpMethod, URL, Params, Consumer, TokenSecret) ->
   verify_in_constant_time(Signature, hmac_sha1_signature(HttpMethod, URL, Params, Consumer, TokenSecret)).
 
 hmac_sha1_verify(Signature, BaseString, Consumer, TokenSecret) ->
   verify_in_constant_time(Signature, hmac_sha1_signature(BaseString, Consumer, TokenSecret)).
-
-hmac_sha(Key, Data) ->
-  case erlang:function_exported(crypto, hmac, 3) of
-    true ->
-      crypto:hmac(sha, Key, Data);
-    false ->
-      crypto:sha_mac(Key, Data)
-  end.
 
 rsa_sha1_signature(HttpMethod, URL, Params, Consumer) ->
   BaseString = signature_base_string(HttpMethod, URL, Params),
@@ -313,3 +311,4 @@ hex2dec(C) when C >= $A andalso C =< $F ->
   C - $A + 10;
 hex2dec(C) when C >= $0 andalso C =< $9 ->
   C - $0.
+
