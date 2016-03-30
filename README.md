@@ -68,7 +68,7 @@ to cover [OAuth 2.0](http://oauth.net/2/).
 Erlang/OTP R14B or greater.
 
 
-## [Rebar](https://github.com/basho/rebar) compatibility
+## [Rebar](https://github.com/rebar/rebar) compatibility
 
 This implementation should be fully compatible with rebar. Add erlang-oauth
 as a dependency to your rebar.config file like this:
@@ -77,7 +77,7 @@ as a dependency to your rebar.config file like this:
       {oauth, ".*", {git, "https://github.com/tim/erlang-oauth.git"}}
     ]}.
 
-Please consult the [relevant rebar wiki page](https://github.com/basho/rebar/wiki/Dependency-management)
+Please consult the [relevant rebar wiki page](https://github.com/rebar/rebar/wiki/Dependency-management)
 for more information.
 
 
