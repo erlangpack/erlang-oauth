@@ -77,7 +77,7 @@ signature_params(Consumer, Params, Token) ->
 
 signature_params(Consumer, Params) ->
   Timestamp = unix_timestamp(),
-  Nonce = base64:encode_to_string(crypto:rand_bytes(32)), % cf. ruby-oauth
+  Nonce = base64:encode_to_string(crypto:strong_rand_bytes(32)), % cf. ruby-oauth
   [ {"oauth_version", "1.0"}
   , {"oauth_nonce", Nonce}
   , {"oauth_timestamp", integer_to_list(Timestamp)}
