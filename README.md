@@ -4,6 +4,23 @@ An Erlang OAuth 1.0 implementation. Includes functions for generating signatures
 (client side), verifying signatures (server side), and some convenience functions
 for making OAuth HTTP requests (client side).
 
+## Erlang/OTP compatibility
+
+Erlang/OTP R16B03 or greater.
+
+
+## Rebar compatibility
+
+This implementation should be fully compatible with [rebar](https://github.com/rebar/rebar) and [rebar3](https://github.com/erlang/rebar3).
+
+Add erlang-oauth as a dependency to your rebar.config file like this:
+
+    {deps, [
+      {oauth, ".*", {git, "https://github.com/tim/erlang-oauth.git"}}
+    ]}.
+
+Consult the rebar docs for more information.
+
 ## Quick start (client usage)
 
     $ make
@@ -55,33 +72,12 @@ Consumers are represented using tuples:
 ```
 
 
-## OAuth compatibility
+## Other notes
 
 This implementation should be compatible with the signature algorithms
 presented in [RFC5849 - The OAuth 1.0 Protocol](http://tools.ietf.org/html/rfc5849),
 and [OAuth Core 1.0 Revision A](http://oauth.net/core/1.0a/). It is *not* intended
 to cover [OAuth 2.0](http://oauth.net/2/).
-
-
-## OTP compatibility
-
-Erlang/OTP R14B or greater.
-
-
-## [Rebar](https://github.com/rebar/rebar) compatibility
-
-This implementation should be fully compatible with rebar. Add erlang-oauth
-as a dependency to your rebar.config file like this:
-
-    {deps, [
-      {oauth, ".*", {git, "https://github.com/tim/erlang-oauth.git"}}
-    ]}.
-
-Please consult the [relevant rebar wiki page](https://github.com/rebar/rebar/wiki/Dependency-management)
-for more information.
-
-
-## Other notes
 
 This is *not* a "plug and play" server implementation. In order to implement OAuth
 correctly as a provider you have more work to do: token storage, nonce and timestamp
