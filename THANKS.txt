@@ -21,3 +21,5 @@ Thanks to the following for patches and suggestions:
 * Ryan Flynn <github.com/rflynn>
 
 * naoya_t <github.com/naoyat>
+
+* narugami <github.com/narugami>
