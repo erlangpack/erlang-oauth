@@ -1,0 +1,9 @@
+{application, oauth, [
+    {description, "An Erlang OAuth 1.0 implementation"},
+    {vsn, "git"},
+    {registered, []},
+    {applications, [kernel, stdlib, crypto, public_key, inets]},
+    {maintainers, ["Tim Fletcher"]},
+    {licenses, ["MIT"]},
+    {links, [{"GitHub", "https://github.com/tim/erlang-oauth"}]}
+]}.

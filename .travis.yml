@@ -1,6 +1,24 @@
 language: erlang
+sudo: false
 otp_release:
+  - 20.0
   - 19.2
   - 18.3
   - 17.5
   - R16B03
+install:
+  - wget https://s3.amazonaws.com/rebar3/rebar3 && chmod +x rebar3
+test:
+  - ./rebar3 eunit
+jobs:
+  include:
+    - stage: deploy
+      otp_release: 20.0
+      script: skip
+      deploy:
+        provider: script
+        script: "bash -c 'source <(curl -s https://raw.githubusercontent.com/zotonic/hexpub/master/hexpub.sh)'"
+        skip_cleanup: true
+        on:
+          tags: true
+          all_branches: true
