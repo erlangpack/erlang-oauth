@@ -21,8 +21,9 @@
 
 -module(oauth).
 
--export([get/3, get/5, get/6, post/3, post/5, post/6, put/6, put/7, uri/2, header/1,
-  sign/6, params_decode/1, token/1, token_secret/1, verify/6]).
+-export([get/3, get/5, get/6, post/3, post/5, post/6, delete/3, delete/5, delete/6, put/6, put/7]).
+
+-export([uri/2, header/1, sign/6, params_decode/1, token/1, token_secret/1, verify/6]).
 
 -export([plaintext_signature/2, hmac_sha1_signature/5,
   hmac_sha1_signature/3, rsa_sha1_signature/4, rsa_sha1_signature/2,
@@ -60,6 +61,16 @@ post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
 post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = sign("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
   http_request(post, {URL, [], "application/x-www-form-urlencoded", uri_string:compose_query(SignedParams)}, HttpcOptions).
+
+delete(URL, ExtraParams, Consumer) ->
+  delete(URL, ExtraParams, Consumer, "", "").
+
+delete(URL, ExtraParams, Consumer, Token, TokenSecret) ->
+  delete(URL, ExtraParams, Consumer, Token, TokenSecret, []).
+
+delete(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
+  SignedParams = sign("DELETE", URL, ExtraParams, Consumer, Token, TokenSecret),
+  http_request(delete, {URL, [], "application/x-www-form-urlencoded", uri_string:compose_query(SignedParams)}, HttpcOptions).
 
 put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret) ->
   put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, []).
