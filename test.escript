@@ -29,7 +29,7 @@ hmac_sha1_tests() ->
 rsa_sha1_tests() ->
   Pkey = data_path("rsa_sha1_private_key.pem"),
   Cert = data_path("rsa_sha1_certificate.pem"),
-  [BaseString, Signature] = read([base_string, signature], "rsa_sha1_test"),
+  [BaseString, Signature] = read([base_string, signature], data_path("rsa_sha1_test")),
   SignatureTest = ?_assertEqual(Signature, oauth:rsa_sha1_signature(BaseString, {"", Pkey, rsa_sha1})),
   VerifyTest = ?_assertEqual(true, oauth:rsa_sha1_verify(Signature, BaseString, {"", Cert, rsa_sha1})),
   [SignatureTest, VerifyTest].
@@ -38,8 +38,8 @@ test_with(FilenamePattern, Keys, Fun) ->
   lists:flatten(lists:map(fun (Path) -> apply(Fun, read(Keys, Path)) end, filelib:wildcard(data_path(FilenamePattern)))).
 
 data_path(Basename) ->
-  filename:join([filename:dirname(filename:absname(escript:script_name())), "testdata", Basename]).
+  filename:join(["testdata", Basename]).
 
-read(Keys, Filename) ->
-  {ok, Proplist} = file:consult(data_path(Filename)),
+read(Keys, Path) ->
+  {ok, Proplist} = file:consult(Path),
   [proplists:get_value(K, Proplist) || K <- Keys].
