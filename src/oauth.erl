@@ -170,7 +170,7 @@ verify_in_constant_time([], [], Result) ->
   Result == 0.
 
 signature_base_string(HttpMethod, URL, Params) ->
-  uri_join([HttpMethod, uri_normalize(URL), params_encode(Params)]).
+  uri_join([HttpMethod, base_string_uri(URL), params_encode(Params)]).
 
 params_encode(Params) ->
   % cf. http://tools.ietf.org/html/rfc5849#section-3.4.1.3.2
@@ -217,37 +217,29 @@ header_param_decode(Param) ->
   Value = string:substr(QuotedValue, 2, length(QuotedValue) - 2),
   {uri_decode(Key), uri_decode(Value)}.
 
-uri_normalize(URI) ->
-  case http_uri:parse(URI) of
-    {ok, {Scheme, UserInfo, Host, Port, Path, _Query}} -> % R15B
-      uri_normalize(Scheme, UserInfo, string:to_lower(Host), Port, [Path]);
-    {Scheme, UserInfo, Host, Port, Path, _Query} ->
-      uri_normalize(Scheme, UserInfo, string:to_lower(Host), Port, [Path]);
-    Else ->
-      Else
-  end.
+base_string_uri(Str) ->
+  % https://tools.ietf.org/html/rfc5849#section-3.4.1.2
+  Map1 = uri_string:parse(Str),
+  Scheme = string:to_lower(maps:get(scheme, Map1)),
+  Host = string:to_lower(maps:get(host, Map1)),
+  Map2 = maps:put(scheme, Scheme, Map1),
+  Map3 = maps:put(host, Host, Map2),
+  Map4 = maps:remove(query, Map3),
+  Map5 = without_default_port(Scheme, Map4),
+  uri_string:recompose(Map5).
 
-uri_normalize(http, UserInfo, Host, 80, Acc) ->
-  uri_normalize(http, UserInfo, [Host|Acc]);
-uri_normalize(https, UserInfo, Host, 443, Acc) ->
-  uri_normalize(https, UserInfo, [Host|Acc]);
-uri_normalize(Scheme, UserInfo, Host, Port, Acc) ->
-  uri_normalize(Scheme, UserInfo, [Host, ":", Port|Acc]).
-
-uri_normalize(Scheme, [], Acc) ->
-  lists:concat([Scheme, "://" | Acc]);
-uri_normalize(Scheme, UserInfo, Acc) ->
-  lists:concat([Scheme, "://", UserInfo, "@" | Acc]).
+without_default_port("http", #{ port := 80 } = Map) ->
+  maps:remove(port, Map);
+without_default_port("https", #{ port := 443 } = Map) ->
+  maps:remove(port, Map);
+without_default_port(_Scheme, Map) ->
+  Map.
 
 uri_params_encode(Params) ->
-  intercalate("&", [uri_join([K, V], "=") || {K, V} <- Params]).
+  uri_string:compose_query(Params).
 
 uri_params_decode(String) ->
-  [uri_param_decode(Substring) || Substring <- string:tokens(String, "&")].
-
-uri_param_decode(String) ->
-  [Key, Value] = string:tokens(String, "="),
-  {uri_decode(Key), uri_decode(Value)}.
+  uri_string:dissect_query(String).
 
 uri_join(Values) ->
   uri_join(Values, "&").
