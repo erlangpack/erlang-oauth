@@ -1,25 +1,26 @@
 # erlang-oauth
 
-An Erlang OAuth 1.0 implementation. Includes functions for generating signatures
-(client side), verifying signatures (server side), and some convenience functions
-for making OAuth HTTP requests (client side).
+An Erlang implementation of [The OAuth 1.0 Protocol](https://tools.ietf.org/html/rfc5849).
+
+Functions for generating signatures (client side), verifying signatures (server side),
+and some convenience functions for making OAuth HTTP requests (client side).
+
 
 ## Erlang/OTP compatibility
 
-Erlang/OTP R16B03 or greater.
+Erlang/OTP 21 or greater.
 
 
-## Rebar compatibility
-
-This implementation should be fully compatible with [rebar](https://github.com/rebar/rebar) and [rebar3](https://github.com/erlang/rebar3).
+## Rebar3 compatibility
 
 Add erlang-oauth as a dependency to your rebar.config file like this:
 
     {deps, [
-      {oauth, ".*", {git, "https://github.com/tim/erlang-oauth.git"}}
+      {oauth, {git, "https://github.com/tim/erlang-oauth.git"}}
     ]}.
 
 Consult the rebar docs for more information.
+
 
 ## Quick start (client usage)
 

@@ -20,6 +20,8 @@ Thanks to the following for patches and suggestions:
 
 * Ryan Flynn <github.com/rflynn>
 
+* Sebastian Borrazas <github.com/sborrazas>
+
 * naoya_t <github.com/naoyat>
 
 * narugami <github.com/narugami>
