@@ -1,0 +1,36 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test-ubuntu:
+    runs-on: ubuntu-18.04
+    name: OTP ${{matrix.otp_version}}
+    strategy:
+      matrix:
+        otp_version:
+          - 21.3
+          - 22.3
+          - 23.2
+    steps:
+    - uses: actions/checkout@v2
+    - uses: gleam-lang/setup-erlang@v1.1.2
+      with:
+        otp-version: ${{matrix.otp_version}}
+    - run: |
+        erl -make
+        escript test.escript
+
+  test-windows:
+    runs-on: windows-latest
+    name: Windows
+    steps:
+    - uses: actions/checkout@v2
+    - uses: gleam-lang/setup-erlang@v1.1.2
+      with:
+        otp-version: 23.2
+      id: setup
+    - run: |
+        $env:PATH = "${{ steps.setup.outputs.erlpath }}\bin;$env:PATH"
+        erl.exe -make
+        escript.exe test.escript
