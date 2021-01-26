@@ -10,8 +10,7 @@
 -export([plaintext_verify/3, hmac_sha1_verify/6, hmac_sha1_verify/4,
   rsa_sha1_verify/5, rsa_sha1_verify/3]).
 
--export([header_params_encode/1, header_params_decode/1,
-  uri_params_encode/1, uri_params_decode/1]).
+-export([header_params_encode/1, header_params_decode/1]).
 
 -include_lib("public_key/include/public_key.hrl").
 
@@ -39,7 +38,7 @@ post(URL, ExtraParams, Consumer, Token, TokenSecret) ->
 
 post(URL, ExtraParams, Consumer, Token, TokenSecret, HttpcOptions) ->
   SignedParams = sign("POST", URL, ExtraParams, Consumer, Token, TokenSecret),
-  http_request(post, {URL, [], "application/x-www-form-urlencoded", uri_params_encode(SignedParams)}, HttpcOptions).
+  http_request(post, {URL, [], "application/x-www-form-urlencoded", uri_string:compose_query(SignedParams)}, HttpcOptions).
 
 put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret) ->
   put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, []).
@@ -51,7 +50,7 @@ put(URL, ExtraParams, {ContentType, Body}, Consumer, Token, TokenSecret, HttpcOp
 uri(Base, []) ->
   Base;
 uri(Base, Params) ->
-  lists:concat([Base, "?", uri_params_encode(Params)]).
+  lists:concat([Base, "?", uri_string:compose_query(Params)]).
 
 header(Params) ->
   {"Authorization", "OAuth " ++ header_params_encode(Params)}.
@@ -186,7 +185,7 @@ params_encode(Params) ->
   string:join(Concatenated, "&").
 
 params_decode(_Response={{_, _, _}, _, Body}) ->
-  uri_params_decode(Body).
+  uri_string:dissect_query(Body).
 
 http_request(Method, Request, Options) ->
   httpc:request(Method, Request, [{autoredirect, false}], Options).
@@ -240,12 +239,6 @@ without_default_port("https", #{ port := 443 } = Map) ->
   maps:remove(port, Map);
 without_default_port(_Scheme, Map) ->
   Map.
-
-uri_params_encode(Params) ->
-  uri_string:compose_query(Params).
-
-uri_params_decode(String) ->
-  uri_string:dissect_query(String).
 
 uri_join(Values) ->
   uri_join(Values, "&").
