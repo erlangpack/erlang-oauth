@@ -15,6 +15,12 @@
 
 -include_lib("public_key/include/public_key.hrl").
 
+-if(?OTP_RELEASE >= 22).
+-define(HMAC_SHA1(Key, Data), crypto:mac(hmac, sha, Key, Data)).
+-else.
+-define(HMAC_SHA1(Key, Data), crypto:hmac(sha, Key, Data)).
+-endif.
+
 get(URL, ExtraParams, Consumer) ->
   get(URL, ExtraParams, Consumer, "", "").
 
@@ -128,7 +134,7 @@ hmac_sha1_signature(HttpMethod, URL, Params, Consumer, TokenSecret) ->
 
 hmac_sha1_signature(BaseString, Consumer, TokenSecret) ->
   Key = uri_join([consumer_secret(Consumer), TokenSecret]),
-  base64:encode_to_string(crypto:hmac(sha, Key, BaseString)).
+  base64:encode_to_string(?HMAC_SHA1(Key, BaseString)).
 
 hmac_sha1_verify(Signature, HttpMethod, URL, Params, Consumer, TokenSecret) ->
   verify_in_constant_time(Signature, hmac_sha1_signature(HttpMethod, URL, Params, Consumer, TokenSecret)).
