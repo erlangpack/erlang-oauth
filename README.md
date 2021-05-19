@@ -24,8 +24,8 @@ Consult the rebar docs for more information.
 
 ## Quick start (client usage)
 
-    $ make
-    ...
+    $ erl -make
+    Recompile: src/oauth
     $ erl -pa ebin -s crypto -s inets
     ...
     1> Consumer = {"key", "secret", hmac_sha1}.
