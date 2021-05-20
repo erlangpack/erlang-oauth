@@ -11,17 +11,6 @@ and some convenience functions for making OAuth HTTP requests (client side).
 Erlang/OTP 21 or greater.
 
 
-## Rebar3 compatibility
-
-Add erlang-oauth as a dependency to your rebar.config file like this:
-
-    {deps, [
-      {oauth, {git, "https://github.com/tim/erlang-oauth.git"}}
-    ]}.
-
-Consult the rebar docs for more information.
-
-
 ## Quick start (client usage)
 
     $ erl -make
@@ -87,12 +76,10 @@ verification etc.
 This is *not* a "bells and whistles" HTTP client. If you need fine grained control
 over your HTTP requests or you prefer to use something other than inets/httpc then you
 will need to assemble the requests yourself. Use `oauth:sign/6` to generate a list of
-signed OAuth parameters, `oauth:uri_params_encode/1` or `oauth:header_params_encode/1` to
-encode the parameters, and then assemble the request using your HTTP client of choice.
+signed OAuth parameters, and then either `oauth:uri_params_encode/1` or `oauth:header_params_encode/1`
+to encode the signed parameters.
 
 The percent encoding/decoding implementations are based on [ibrowse](https://github.com/cmullaparthi/ibrowse)
-
-Example client/server code: [github.com/tim/erlang-oauth-examples](https://github.com/tim/erlang-oauth-examples)
 
 
 ## License
