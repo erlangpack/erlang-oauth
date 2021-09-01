@@ -191,8 +191,6 @@ rsa_sha1_verify(Signature, BaseString, Consumer) when is_binary(BaseString) ->
 rsa_sha1_verify(Signature, BaseString, Consumer) when is_list(BaseString) ->
   rsa_sha1_verify(Signature, list_to_binary(BaseString), Consumer).
 
-verify_in_constant_time(<<X/binary>>, <<Y/binary>>) ->
-  verify_in_constant_time(binary_to_list(X), binary_to_list(Y));
 verify_in_constant_time(X, Y) when is_list(X) and is_list(Y) ->
   case length(X) == length(Y) of
     true ->

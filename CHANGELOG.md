@@ -1,3 +1,12 @@
+# 2.1.0
+
+ * Automatic test builds
+
+ * rebar3 build tool
+
+ * reorganize tests to use CT and rebar3
+
+
 # 2.0.0
 
   * **Erlang/OTP 21 or greater now required**

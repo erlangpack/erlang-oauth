@@ -1,0 +1,10 @@
+{application, oauth, [
+  {description, "An Erlang OAuth 1.0 implementation"},
+  {vsn, git},
+  {modules, [oauth]},
+  {registered, []},
+  {applications, [kernel, stdlib, crypto, public_key, inets]},
+  {doc, "doc"},
+  {licenses, ["MIT"]},
+  {links, [{"GitHub", "https://github.com/erlangpack/erlang-oauth"}]}
+]}.

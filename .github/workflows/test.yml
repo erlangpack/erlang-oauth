@@ -1,36 +1,36 @@
+# This workflow checks the tests and dialyzer.
+
 name: Test
 
-on: [push, pull_request]
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  test-ubuntu:
-    runs-on: ubuntu-18.04
-    name: OTP ${{matrix.otp_version}}
+  linux:
+    name: Test on OTP ${{ matrix.otp_version }}
+    runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
-        otp_version:
-          - 21.3
-          - 22.3
-          - 23.2
-    steps:
-    - uses: actions/checkout@v2
-    - uses: gleam-lang/setup-erlang@v1.1.2
-      with:
-        otp-version: ${{matrix.otp_version}}
-    - run: |
-        erl -make
-        escript test.escript
+        otp_version: [22.3, 23.3, 24.0.5]
+        os: [ubuntu-latest]
 
-  test-windows:
-    runs-on: windows-latest
-    name: Windows
+    container:
+      image: erlang:${{ matrix.otp_version }}
+
     steps:
-    - uses: actions/checkout@v2
-    - uses: gleam-lang/setup-erlang@v1.1.2
-      with:
-        otp-version: 23.2
-      id: setup
-    - run: |
-        $env:PATH = "${{ steps.setup.outputs.erlpath }}\bin;$env:PATH"
-        erl.exe -make
-        escript.exe test.escript
+      - uses: actions/checkout@v2
+      - name: Compile
+        run: make
+      - name: Test
+        run: make test
+      - name: XRef
+        run: make xref
+      - name: Dialyzer
+        run: make dialyzer

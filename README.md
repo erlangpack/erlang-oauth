@@ -5,6 +5,14 @@ An Erlang implementation of [The OAuth 1.0 Protocol](https://tools.ietf.org/html
 Functions for generating signatures (client side), verifying signatures (server side),
 and some convenience functions for making OAuth HTTP requests (client side).
 
+## Usage
+
+Erlang-ouath is on Hex, you can use the package by:
+
+    {deps, [
+        {oauth, "2.1.0"}
+    ]}.
+
 
 ## Erlang/OTP compatibility
 
