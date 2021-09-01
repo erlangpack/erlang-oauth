@@ -7,24 +7,17 @@
 # 2.0.0
 
   * **Erlang/OTP 21 or greater now required**
-
   * Added support for crypto:mac/4 in OTP 22+
-
   * Added delete/3, delete/5, and delete/6 functions
-
   * Removed uri_params_encode/1 function (use uri_string:compose_query/1 instead)
-
   * Removed uri_params_decode/1 function (use uri_string:dissect_query/1 instead)
 
 
 # 1.6.0
 
   * Switched to using crypto:hmac/3
-
   * Switched to using crypto:strong_rand_bytes/1
-
   * Exported oauth:signature/5 function
-
   * Erlang/OTP R16B03 or greater now required
 
 
@@ -36,7 +29,6 @@
 # 1.4.0
 
   * Added support for new crypto:hmac/3 function
-
   * Moved unit tests from github.com/tim/erlang-oauth-tests
 
 
@@ -58,7 +50,6 @@
 # 1.2.0
 
   * Added oauth:get/3 and oauth:post/3 functions
-
   * Collapsed into just a single module
 
 
