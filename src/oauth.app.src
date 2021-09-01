@@ -4,6 +4,7 @@
   {modules, [oauth]},
   {registered, []},
   {applications, [kernel, stdlib, crypto, public_key, inets]},
-  {licenses, ["MIT License"]},
+  {doc, "doc"},
+  {licenses, ["MIT"]},
   {links, [{"GitHub", "https://github.com/erlangpack/erlang-oauth"}]}
 ]}.
