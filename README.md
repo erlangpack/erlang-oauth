@@ -7,7 +7,7 @@ and some convenience functions for making OAuth HTTP requests (client side).
 
 ## Usage
 
-Erlang-ouath is on Hex, you can use the package by:
+Erlang-oauth is on Hex, you can use the package by adding it into your rebar.config:
 
     {deps, [
         {oauth, "2.1.0"}
