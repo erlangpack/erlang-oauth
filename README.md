@@ -104,11 +104,11 @@ The percent encoding/decoding implementations are based on [ibrowse](https://git
 This project is licensed under the terms of the [MIT license](https://opensource.org/licenses/MIT).
 
 <!-- Badges -->
-[hexpm]: https://hex.pm/packages/erlang-oauth
-[hexpm version]: https://img.shields.io/hexpm/v/erlang-oauth.svg?style=flat-curcle "Hex version"
-[hexpm downloads]: https://img.shields.io/hexpm/dt/erlang-oauth.svg?style=flat-curcle
+[hexpm]: https://hex.pm/packages/oauth
+[hexpm version]: https://img.shields.io/hexpm/v/oauth.svg?style=flat-curcle "Hex version"
+[hexpm downloads]: https://img.shields.io/hexpm/dt/oauth.svg?style=flat-curcle
 [hexdocs documentation]: https://img.shields.io/badge/hex-docs-purple.svg?style=flat-curcle
-[hexdocs]: https://hexdocs.pm/erlang-oauth
+[hexdocs]: https://hexdocs.pm/oauth
 [gh]: https://github.com/erlangpack/erlang-oauth/actions/workflows/test.yaml
 [gh badge]: https://github.com/erlangpack/erlang-oauth/workflows/Test/badge.svg
 [erlang version badge]: https://img.shields.io/badge/Supported%20Erlang%2FOTP-21%20to%2023-blue.svg?style=flat-curcle
