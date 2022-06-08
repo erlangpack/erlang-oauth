@@ -1,9 +1,18 @@
+[![Build Status][gh badge]][gh]
+[![Hex.pm version][hexpm version]][hexpm]
+[![Hex.pm Downloads][hexpm downloads]][hexpm]
+[![Hex.pm Documentation][hexdocs documentation]][hexdocs]
+[![Erlang Versions][erlang version badge]][gh]
+[![License][license]](LICENSE.txt)
+
 # erlang-oauth
 
 An Erlang implementation of [The OAuth 1.0 Protocol](https://tools.ietf.org/html/rfc5849).
 
-Functions for generating signatures (client side), verifying signatures (server side),
-and some convenience functions for making OAuth HTTP requests (client side).
+There are functions for 
+  - generating signatures (*client* side), 
+  - verifying signatures (*server* side),
+  - some convenience functions for making OAuth HTTP requests (*client* side).
 
 ## Usage
 
@@ -93,3 +102,14 @@ The percent encoding/decoding implementations are based on [ibrowse](https://git
 ## License
 
 This project is licensed under the terms of the [MIT license](https://opensource.org/licenses/MIT).
+
+<!-- Badges -->
+[hexpm]: https://hex.pm/packages/erlang-oauth
+[hexpm version]: https://img.shields.io/hexpm/v/erlang-oauth.svg?style=flat-curcle "Hex version"
+[hexpm downloads]: https://img.shields.io/hexpm/dt/erlang-oauth.svg?style=flat-curcle
+[hexdocs documentation]: https://img.shields.io/badge/hex-docs-purple.svg?style=flat-curcle
+[hexdocs]: https://hexdocs.pm/erlang-oauth
+[gh]: https://github.com/erlangpack/erlang-oauth/actions/workflows/test.yaml
+[gh badge]: https://github.com/erlangpack/erlang-oauth/workflows/Test/badge.svg
+[erlang version badge]: https://img.shields.io/badge/Supported%20Erlang%2FOTP-21%20to%2023-blue.svg?style=flat-curcle
+[license]: https://img.shields.io/badge/License-MIT-blue.svg "MIT"
