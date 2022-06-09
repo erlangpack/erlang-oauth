@@ -37,6 +37,14 @@
 -include_lib("public_key/include/public_key.hrl").
 
 -type signature_method() :: plaintext | hmac_sha1 | rsa_sha1.
+%% <ul>
+%%  <li>`PLAINTEXT' is a simple method for a more efficient implementation which offloads 
+%% most of the security requirements to the HTTPS layer.</li>
+%% <li>`HMAC-SHA1' offers a simple and common algorithm that is available on most platforms 
+%% but not on all legacy devices and uses a symmetric shared secret.</li>
+%% <li>`RSA-SHA1' provides enhanced security using key-pairs but is more complex and 
+%% requires key generation and a longer learning curve.</li>
+%% </ul>
 -export_type([
 	signature_method/0
 ]).
