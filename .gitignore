@@ -1,0 +1,11 @@
+.eunit
+*.beam
+ebin/
+_build/
+rebar3
+.rebar3
+deps
+.depsolver_plt
+doc/*
+!doc/style.css
+!doc/overview.edoc
